@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SWE-bench por dentro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna de lectura con diagramas más anchos; cada proceso tiene su color y lo conserva en toda la página */
+:root {
+  --bg: #F4F6F9;
+  --surface: #FFFFFF;
+  --fg: #18202E;
+  --muted: #586274;
+  --line: #D6DCE5;
+  --code-bg: #ECEFF4;
+  --model: #7352B8;  --model-soft: #EFEAFA;
+  --agent: #2462C8;  --agent-soft: #E6EEFB;
+  --worker: #15805B; --worker-soft: #E2F3EB;
+  --mcp: #B26A00;    --mcp-soft: #FAEFDD;
+  --box: #BE3A54;    --box-soft: #FAE6EA;
+  --del: #B4283F;    --add: #137046;
+  --font-display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151C; --surface: #191F28; --fg: #E3E7EE; --muted: #98A2B3;
+    --line: #2B3441; --code-bg: #212833;
+    --model: #A88BEE;  --model-soft: #29223D;
+    --agent: #6FA2F4;  --agent-soft: #1A2840;
+    --worker: #4CC596; --worker-soft: #15312A;
+    --mcp: #E8A23E;    --mcp-soft: #372A15;
+    --box: #EF7891;    --box-soft: #3A1D26;
+    --del: #F08A9C;    --add: #5BD39A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151C; --surface: #191F28; --fg: #E3E7EE; --muted: #98A2B3;
+  --line: #2B3441; --code-bg: #212833;
+  --model: #A88BEE;  --model-soft: #29223D;
+  --agent: #6FA2F4;  --agent-soft: #1A2840;
+  --worker: #4CC596; --worker-soft: #15312A;
+  --mcp: #E8A23E;    --mcp-soft: #372A15;
+  --box: #EF7891;    --box-soft: #3A1D26;
+  --del: #F08A9C;    --add: #5BD39A;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.62;
+}
+.page {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+  padding-block: 2.5rem 4rem;
+}
+.prose { max-width: 46rem; display: grid; gap: 1rem; min-width: 0; }
+p, ul, ol, dl, figure, pre { margin: 0; }
+a { color: var(--agent); }
+a:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; border-radius: 2px; }
+strong { font-weight: 600; }
+
+/* Cabecera */
+header { display: grid; gap: 1.25rem; padding-bottom: 2rem; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: .78rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+}
+h1 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(2.1rem, 6vw, 3.4rem); line-height: 1.04;
+  letter-spacing: -.025em; margin: 0; text-wrap: balance;
+}
+.lede { font-size: 1.15rem; max-width: 42rem; text-wrap: pretty; }
+.facts {
+  display: flex; flex-wrap: wrap; gap: .75rem 2rem;
+  padding: 1rem 1.25rem; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px;
+}
+.facts div { display: grid; gap: .1rem; min-width: 0; }
+.facts dt {
+  font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+}
+.facts dd { margin: 0; font-family: var(--font-mono); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.pass { color: var(--add); font-weight: 600; }
+
+nav.toc { display: flex; flex-wrap: wrap; gap: .4rem .5rem; font-size: .9rem; }
+nav.toc a {
+  text-decoration: none; color: var(--fg); padding: .2rem .65rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+}
+nav.toc a:hover { border-color: var(--muted); }
+
+/* Secciones */
+section {
+  display: grid; gap: 1.25rem;
+  padding-block: 2.75rem;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 1rem;
+}
+h2 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.45rem, 3.4vw, 1.9rem); line-height: 1.15;
+  letter-spacing: -.015em; margin: 0; text-wrap: balance;
+}
+h3 { font-size: 1.05rem; margin: 0; font-weight: 600; text-wrap: balance; }
+.kicker { color: var(--muted); font-size: .95rem; }
+
+/* Chips de proceso: el punto lleva el color del proceso */
+.who {
+  display: inline-flex; align-items: center; gap: .4em;
+  padding: .02em .6em .06em; border-radius: 999px;
+  font-size: .86em; font-weight: 600; white-space: nowrap;
+  background: var(--soft); color: var(--fg);
+}
+.who::before { content: ""; width: .55em; height: .55em; border-radius: 50%; background: var(--c); }
+.who.model  { --c: var(--model);  --soft: var(--model-soft); }
+.who.agent  { --c: var(--agent);  --soft: var(--agent-soft); }
+.who.worker { --c: var(--worker); --soft: var(--worker-soft); }
+.who.mcp    { --c: var(--mcp);    --soft: var(--mcp-soft); }
+.who.box    { --c: var(--box);    --soft: var(--box-soft); }
+
+code, .ref { font-family: var(--font-mono); font-size: .86em; }
+:not(pre) > code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+.ref {
+  display: inline-block; background: var(--code-bg); border: 1px solid var(--line);
+  padding: .02em .45em; border-radius: 5px; white-space: nowrap; font-size: .8em;
+}
+.fn { font-family: var(--font-mono); font-weight: 600; font-size: .86em; }
+
+pre {
+  padding: .9rem 1rem; background: var(--code-bg); border-radius: 8px;
+  overflow-x: auto; font-family: var(--font-mono); font-size: .82rem; line-height: 1.55;
+  tab-size: 4; min-width: 0;
+}
+pre .del { color: var(--del); }
+pre .add { color: var(--add); font-weight: 600; }
+pre .cm { color: var(--muted); }
+
+/* Analogía */
+.analogy { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+.analogy div { display: grid; gap: .35rem; align-content: start; padding-top: .75rem; border-top: 3px solid var(--c); min-width: 0; }
+.analogy .model { --c: var(--model); }
+.analogy .agent { --c: var(--agent); }
+.analogy .box   { --c: var(--box); }
+.analogy b { font-family: var(--font-display); font-size: 1.15rem; }
+
+/* Diagramas */
+.figure {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 1rem; overflow-x: auto; display: grid; gap: .75rem;
+}
+.figure svg { display: block; width: 100%; min-width: 760px; height: auto; }
+.caption { font-size: .85rem; color: var(--muted); }
+svg text { font-family: var(--font-body); fill: var(--fg); }
+.zone { fill: none; stroke: var(--muted); stroke-opacity: .5; stroke-width: 1.3; stroke-dasharray: 6 5; }
+.zone-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; fill: var(--muted); font-weight: 600; }
+.node { stroke-width: 1.6; }
+.n-model  { fill: var(--model-soft);  stroke: var(--model); }
+.n-agent  { fill: var(--agent-soft);  stroke: var(--agent); }
+.n-worker { fill: var(--worker-soft); stroke: var(--worker); }
+.n-mcp    { fill: var(--mcp-soft);    stroke: var(--mcp); }
+.n-box    { fill: var(--box-soft);    stroke: var(--box); }
+.n-name { font-weight: 700; font-size: 15px; text-anchor: middle; }
+.n-sub  { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); text-anchor: middle; }
+.n-note { font-size: 12px; fill: var(--muted); text-anchor: middle; }
+.e-label { font-size: 12px; }
+.e-mono  { font-family: var(--font-mono); font-size: 11.5px; }
+.mid { text-anchor: middle; }
+.end { text-anchor: end; }
+.halo { paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+.edge { fill: none; stroke-width: 1.8; }
+.reply { stroke-dasharray: 6 4; }
+.s-model  { stroke: var(--model); }
+.s-agent  { stroke: var(--agent); }
+.s-worker { stroke: var(--worker); }
+.s-mcp    { stroke: var(--mcp); }
+.s-box    { stroke: var(--box); }
+.f-model  { fill: var(--model); }
+.f-agent  { fill: var(--agent); }
+.f-worker { fill: var(--worker); }
+.f-mcp    { fill: var(--mcp); }
+.f-box    { fill: var(--box); }
+.life { stroke-width: 1.2; stroke-dasharray: 2 5; stroke-opacity: .7; }
+.gutter circle { fill: var(--fg); }
+.gutter text { fill: var(--bg); font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-anchor: middle; }
+.row-guide { stroke: var(--line); stroke-width: 1; }
+
+/* Pasos */
+ol.steps { list-style: none; padding: 0; display: grid; gap: 1.5rem; counter-reset: paso; }
+ol.steps > li {
+  display: grid; grid-template-columns: 2.1rem minmax(0, 1fr); column-gap: 1rem; row-gap: .45rem;
+}
+ol.steps > li::before {
+  counter-increment: paso; content: counter(paso);
+  grid-column: 1; grid-row: 1 / span 4; align-self: start;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--fg); color: var(--bg);
+  font-family: var(--font-mono); font-size: .85rem; font-weight: 600;
+}
+ol.steps > li > * { grid-column: 2; min-width: 0; }
+.route { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; font-weight: 600; }
+.arrow { color: var(--muted); }
+.code-at {
+  display: flex; flex-wrap: wrap; gap: .35rem .5rem; align-items: baseline;
+  font-size: .9rem; color: var(--muted);
+}
+.code-at .label {
+  font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
+}
+.callout {
+  padding: 1rem 1.15rem; border-radius: 10px; background: var(--surface);
+  border: 1px solid var(--line); display: grid; gap: .5rem;
+}
+.callout.box { border-left: 4px solid var(--box); }
+
+/* Tablas */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.wide table { min-width: 46rem; }
+th, td { padding: .6rem .8rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th {
+  font-size: .7rem; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--muted); font-weight: 600; background: var(--code-bg);
+}
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+th.num { text-align: right; }
+tbody th { text-transform: none; letter-spacing: 0; font-size: .9rem; color: var(--fg); background: transparent; }
+tr.group td {
+  background: var(--soft); font-weight: 600; font-size: .85rem;
+}
+tr.group.agent  { --soft: var(--agent-soft); }
+tr.group.worker { --soft: var(--worker-soft); }
+tr.group.mcp    { --soft: var(--mcp-soft); }
+tr.group.box    { --soft: var(--box-soft); }
+td.file { font-family: var(--font-mono); font-size: .82rem; white-space: nowrap; }
+
+/* Ciclo de vida del contenedor */
+.lifecycle {
+  list-style: none; padding: 0; counter-reset: fase;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); gap: 1rem;
+}
+.lifecycle li {
+  counter-increment: fase; display: grid; gap: .5rem; align-content: start;
+  padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0;
+}
+.lifecycle li::before {
+  content: "Fase " counter(fase); font-family: var(--font-mono); font-size: .72rem;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--box); font-weight: 600;
+}
+.lifecycle h3 { font-family: var(--font-display); font-size: 1.2rem; }
+
+ol.plain, ul.plain { padding-left: 1.3rem; display: grid; gap: .45rem; }
+
+footer { padding-top: 2rem; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); display: grid; gap: .35rem; }
+
+@media (max-width: 34rem) {
+  .facts { gap: .6rem 1.25rem; }
+  ol.steps > li { grid-template-columns: 1.8rem minmax(0, 1fr); column-gap: .7rem; }
+  ol.steps > li::before { width: 1.75rem; height: 1.75rem; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <p class="eyebrow">Agent Smith · notas de estudio</p>
+  <h1>SWE-bench por dentro</h1>
+  <p class="lede">Qué ocurre, paso a paso, desde que lanzas <code>agent_swebench</code> hasta que se guarda el parche. Usa como ejemplo una ejecución real con el modo DEBUG activado.</p>
+  <dl class="facts" aria-label="Datos de la ejecución de ejemplo">
+    <div><dt>Tarea</dt><dd>django__django-11066</dd></div>
+    <div><dt>Modelo</dt><dd>qwen/qwen3.8-27b · Groq</dd></div>
+    <div><dt>Iteraciones</dt><dd>5</dd></div>
+    <div><dt>Peticiones</dt><dd>7 (2 rechazadas con 429)</dd></div>
+    <div><dt>Tokens</dt><dd>15.363 entrada · 216 salida</dd></div>
+    <div><dt>Tiempo</dt><dd>9,5 s</dd></div>
+    <div><dt>Moulinette</dt><dd class="pass">PASSED</dd></div>
+  </dl>
+  <nav class="toc" aria-label="Contenido">
+    <a href="#idea">La idea</a>
+    <a href="#contenedor">Por qué un contenedor</a>
+    <a href="#piezas">Las piezas</a>
+    <a href="#arranque">Arranque</a>
+    <a href="#iteracion">Una iteración</a>
+    <a href="#tarea">La tarea completa</a>
+    <a href="#tests">run_tests</a>
+    <a href="#vida">Vida del contenedor</a>
+    <a href="#porque">Por qué tantas piezas</a>
+    <a href="#mapa">Mapa de funciones</a>
+    <a href="#repetir">Repetirlo</a>
+  </nav>
+</header>
+
+<section id="idea">
+  <div class="prose">
+    <h2>La idea en una frase</h2>
+    <p><strong>El modelo solo sabe escribir texto. Tu aplicación es la que actúa, y trabaja sobre una copia desechable del proyecto: el contenedor.</strong></p>
+    <p>Piensa en un experto que te ayuda por teléfono:</p>
+  </div>
+  <div class="analogy">
+    <div class="model">
+      <b>El experto</b>
+      <p><span class="who model">Qwen</span> está en los servidores de Groq, en internet. Solo puede hablar, es decir, escribir texto. No ve tu ordenador ni toca nada.</p>
+    </div>
+    <div class="agent">
+      <b>El ayudante</b>
+      <p><span class="who agent">Tu aplicación</span> sostiene el teléfono. Escucha lo que pide el experto, lo hace y le cuenta qué ha pasado.</p>
+    </div>
+    <div class="box">
+      <b>El taller</b>
+      <p><span class="who box">El contenedor</span> es un taller cerrado con el proyecto roto dentro. Se puede trastear sin miedo y al acabar se tira.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contenedor">
+  <div class="prose">
+    <h2>Por qué hace falta un contenedor</h2>
+    <p>Una tarea SWE-bench es <strong>un fallo real de un proyecto real</strong>. En el ejemplo, Django guarda un objet<wbr>o en la base de datos equivocada. Para arreglarlo y comprobarlo necesitas:</p>
+    <ul class="plain">
+      <li>el código de Django <strong>exactamente en la versión que tiene el fallo</strong>;</li>
+      <li>la versión de Python correcta, con sus librerías instaladas;</li>
+      <li>los tests del proyecto, listos para ejecutarse.</li>
+    </ul>
+    <p>Prepararlo a mano es difícil, así que SWE-bench lo entrega hecho como una <strong>imagen Docker</strong>. En el ejemplo es <code>swebench/sweb.eval.x86_64.django_1776_django-11066:latest</code>.</p>
+    <ul class="plain">
+      <li><strong>Imagen</strong>: una foto congelada de un ordenador con todo preparado. El proyecto está en <code>/testbed</code>.</li>
+      <li><strong>Contenedor</strong>: esa foto puesta en marcha. Lo que cambies dentro desaparece cuando se borra. Tu ordenador no se toca, y además arranca <strong>sin red</strong> (<code>--network none</code>).</li>
+    </ul>
+  </div>
+</section>
+
+<section id="piezas">
+  <div class="prose">
+    <h2>Las piezas</h2>
+    <p>Una tarea pone en marcha <strong>tres procesos de Python</strong> en tu ordenador y <strong>un contenedor</strong>. Cada proceso tiene su número (<code>pid</code>), que aparece en cada línea del log. Los <code>pid</code> cambian en cada ejecución; estos son los del ejemplo.</p>
+  </div>
+
+  <figure class="figure">
+    <svg viewBox="0 0 920 400" role="img" aria-labelledby="arch-t arch-d">
+      <title id="arch-t">Las cinco piezas y cómo se comunican</title>
+      <desc id="arch-d">Qwen, en internet, habla por HTTPS con el agente. El agente habla con el trabajador por un Pipe y con el servidor MCP por stdio. El servidor MCP entra en el contenedor con docker exec.</desc>
+      <defs>
+        <marker id="m-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-model"/></marker>
+        <marker id="m-agent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-agent"/></marker>
+        <marker id="m-worker" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-worker"/></marker>
+        <marker id="m-mcp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-mcp"/></marker>
+        <marker id="m-box" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-box"/></marker>
+      </defs>
+
+      <rect class="zone" x="10" y="40" width="200" height="160" rx="12"/>
+      <text class="zone-label" x="24" y="62">INTERNET</text>
+      <rect class="zone" x="230" y="10" width="680" height="380" rx="12"/>
+      <text class="zone-label" x="246" y="32">TU ORDENADOR</text>
+      <rect class="zone" x="715" y="215" width="185" height="160" rx="10"/>
+      <text class="zone-label" x="727" y="235">DOCKER · SIN RED</text>
+
+      <rect class="node n-model" x="30" y="80" width="160" height="96" rx="10"/>
+      <text class="n-name" x="110" y="110">Qwen</text>
+      <text class="n-sub" x="110" y="132">qwen3.8-27b · Groq</text>
+      <text class="n-note" x="110" y="156">solo escribe texto</text>
+
+      <rect class="node n-agent" x="340" y="50" width="260" height="110" rx="10"/>
+      <text class="n-name" x="470" y="80">Agente</text>
+      <text class="n-sub" x="470" y="102">pid 491940</text>
+      <text class="n-sub" x="470" y="122">agent_swebench.py · agent_loop.py</text>
+      <text class="n-note" x="470" y="144">claves · bucle · tokens</text>
+
+      <rect class="node n-worker" x="245" y="250" width="200" height="112" rx="10"/>
+      <text class="n-name" x="345" y="280">Trabajador (sandbox)</text>
+      <text class="n-sub" x="345" y="302">pid 492082</text>
+      <text class="n-sub" x="345" y="322">sandbox.py</text>
+      <text class="n-note" x="345" y="344">ejecuta el código del modelo</text>
+
+      <rect class="node n-mcp" x="465" y="250" width="190" height="112" rx="10"/>
+      <text class="n-name" x="560" y="280">Servidor MCP</text>
+      <text class="n-sub" x="560" y="302">pid 492077</text>
+      <text class="n-sub" x="560" y="322">mcp_tools_swebench.py</text>
+      <text class="n-note" x="560" y="344">9 herramientas</text>
+
+      <rect class="node n-box" x="727" y="248" width="162" height="112" rx="10"/>
+      <text class="n-name" x="808" y="276">Contenedor</text>
+      <text class="n-sub" x="808" y="298" style="font-size:10px">agent-smith-8d023cd56c8e</text>
+      <text class="n-sub" x="808" y="320">/testbed = Django</text>
+      <text class="n-note" x="808" y="342">proceso principal: cat</text>
+
+      <line class="edge s-agent" x1="340" y1="105" x2="193" y2="125" marker-start="url(#m-agent)" marker-end="url(#m-agent)"/>
+      <text class="e-label mid halo" x="266" y="103">HTTPS · texto</text>
+
+      <line class="edge s-agent" x1="420" y1="161" x2="366" y2="248" marker-start="url(#m-agent)" marker-end="url(#m-agent)"/>
+      <text class="e-label end halo" x="380" y="196" font-weight="600">Pipe</text>
+      <text class="e-mono end halo" x="380" y="213">execute · done</text>
+
+      <line class="edge s-agent" x1="520" y1="161" x2="552" y2="248" marker-start="url(#m-agent)" marker-end="url(#m-agent)"/>
+      <text class="e-label halo" x="550" y="196" font-weight="600">stdio</text>
+      <text class="e-mono halo" x="550" y="213">call_tool</text>
+
+      <line class="edge s-mcp" x1="656" y1="306" x2="725" y2="306" marker-end="url(#m-mcp)"/>
+      <text class="e-label mid halo" x="690" y="296">docker exec</text>
+    </svg>
+    <p class="caption">Solo el agente habla con todos. El trabajador y el servidor MCP no se hablan entre sí, y el contenedor solo recibe órdenes del servidor MCP.</p>
+  </figure>
+
+  <div class="table-wrap wide">
+    <table>
+      <thead><tr><th>Pieza</th><th>Qué hace</th><th>Qué <em>no</em> puede hacer</th></tr></thead>
+      <tbody>
+        <tr><td><span class="who agent">Agente</span></td><td>Habla con Qwen, saca el código de su respuesta, cuenta tokens y tiempo, y lo cierra todo al final.</td><td>No ejecuta el código del modelo.</td></tr>
+        <tr><td><span class="who worker">Trabajador</span></td><td>Ejecuta el código Python que escribe el modelo. Conserva las variables entre bloques.</td><td>No tiene claves ni Docker. No puede importar cualquier módulo, abrir cualquier fichero ni usar la red. Tiene 512 MB de memoria como máximo.</td></tr>
+        <tr><td><span class="who mcp">Servidor MCP</span></td><td>Publica las 9 herramientas (<code>read_file</code>, <code>edit_file</code>, <code>run_tests</code>…) y sabe llegar al contenedor.</td><td>No habla con el modelo ni recibe las claves.</td></tr>
+        <tr><td><span class="who box">Contenedor</span></td><td>Ejecuta las órdenes que le llegan, sobre <code>/testbed</code>.</td><td>No sabe nada de los demás. No tiene red.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="arranque">
+  <div class="prose">
+    <h2>Arranque: montar el escenario</h2>
+    <p class="kicker">De 17:17:52 a 17:17:54, unos 2 segundos. Todo lo dirige <span class="fn">run_swebench_agent</span>, en el orden en que aparece en el código.</p>
+  </div>
+  <ol class="steps">
+    <li>
+      <div class="route"><span class="who agent">Agente</span> lee la tarea</div>
+      <p>Lee el JSON de la tarea: el texto del fallo, la imagen Docker y el <code>eval_script</code> con los tests. Luego llama al adaptador de SWE-bench.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">main</span> <span class="ref">agent_swebench.py:54</span> → <span class="ref">agent_swebench.py:65</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> prepara el cliente del modelo</div>
+      <p>Busca el modelo en <code>configs/models_template.json</code> y lee sus claves del <code>.env</code> (<code>GROQ_API_KEY</code>, <code>_2</code>, <code>_3</code>). El log dice <em>claves disponibles=3</em>.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">ProviderClient.from_environment</span> <span class="ref">providers.py:139</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who box">Contenedor</span> nace el contenedor</div>
+      <p>Comprueba que la imagen está descargada, arranca el contenedor y espera a que esté en marcha. Después confirma que existe <code>/testbed</code>.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">SWEEnvironment.start</span> <span class="ref">swebench_agent.py:71</span> <span>llamado en</span> <span class="ref">swebench_agent.py:261</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who mcp">Servidor MCP</span> nace el servidor y se descubren las herramientas</div>
+      <p>Arranca <code>python mcp_tools_swebench.py</code> como proceso hijo y le habla por su entrada y salida estándar (<em>stdio</em>). Le pasa el nombre del contenedor en <code>AGENT_SMITH_CONTAINER_ID</code>, sin las claves. Luego le pregunta qué herramientas tiene y recibe 9 con su descripción. Ese es el <em>manual</em>.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">SWEEnvironment.mcp_environment</span> <span class="ref">swebench_agent.py:120</span> <span class="fn">MCPClient.start</span> <span class="ref">mcp_client.py:189</span> <span class="fn">_discover</span> <span class="ref">mcp_client.py:329</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> escribe las instrucciones del modelo</div>
+      <p>El <em>system prompt</em> son las instrucciones fijas más el manual de herramientas. Por eso el modelo sabe que existe <code>edit_file</code>: nadie lo escribió a mano en el prompt.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">build_swebench_system_prompt</span> <span class="ref">swebench_agent.py:162</span> <span>llamado en</span> <span class="ref">swebench_agent.py:284</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who worker">Trabajador</span> nace el trabajador</div>
+      <p>Lanza un Python nuevo (<code>spawn</code>) en un directorio temporal. Al empezar, el trabajador <strong>borra todas las variables de entorno</strong>, donde estaban las claves. Después aplica los límites (512 MB, sin sockets) y crea una función falsa por cada herramienta. Cuando termina, avisa con <code>ready</code>.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">SandboxSession.start</span> <span class="ref">sandbox_session.py:61</span> <span class="fn">worker_main</span> <span class="ref">sandbox.py:411</span> <span>borra el entorno</span> <span class="ref">sandbox.py:424</span> <span class="fn">_apply_worker_limits</span> <span class="ref">sandbox.py:240</span> <span class="fn">_build_namespace</span> <span class="ref">sandbox.py:327</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> empieza el bucle</div>
+      <p>Ya está todo montado. Empieza <em>Thought → Code → Observation</em>.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">run_agent_loop</span> <span class="ref">agent_loop.py:96</span> <span>llamado en</span> <span class="ref">swebench_agent.py:289</span></div>
+    </li>
+  </ol>
+</section>
+
+<section id="iteracion">
+  <div class="prose">
+    <h2>Una iteración, paso a paso</h2>
+    <p>Esta es la <strong>iteración 3</strong>, la que arregla el fallo. Todo esto tardó menos de un segundo. Las otras iteraciones siguen el mismo camino y solo cambia la herramienta.</p>
+  </div>
+
+  <figure class="figure">
+    <svg viewBox="0 0 960 690" role="img" aria-labelledby="seq-t seq-d">
+      <title id="seq-t">Mensajes de la iteración 3</title>
+      <desc id="seq-d">El agente pide a Qwen la siguiente acción, extrae el código, lo envía al trabajador; el trabajador pide edit_file al agente, el agente al servidor MCP, el servidor al contenedor, y la respuesta vuelve por el mismo camino hasta convertirse en la observación.</desc>
+      <defs>
+        <marker id="q-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-model"/></marker>
+        <marker id="q-agent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-agent"/></marker>
+        <marker id="q-worker" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-worker"/></marker>
+        <marker id="q-mcp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-mcp"/></marker>
+        <marker id="q-box" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="f-box"/></marker>
+      </defs>
+
+      <!-- cabeceras -->
+      <rect class="node n-model" x="75" y="10" width="150" height="44" rx="8"/>
+      <text class="n-name" x="150" y="30" style="font-size:14px">Qwen</text>
+      <text class="n-sub" x="150" y="46">Groq</text>
+      <rect class="node n-agent" x="255" y="10" width="150" height="44" rx="8"/>
+      <text class="n-name" x="330" y="30" style="font-size:14px">Agente</text>
+      <text class="n-sub" x="330" y="46">pid 491940</text>
+      <rect class="node n-worker" x="435" y="10" width="150" height="44" rx="8"/>
+      <text class="n-name" x="510" y="30" style="font-size:14px">Trabajador</text>
+      <text class="n-sub" x="510" y="46">pid 492082</text>
+      <rect class="node n-mcp" x="615" y="10" width="150" height="44" rx="8"/>
+      <text class="n-name" x="690" y="30" style="font-size:14px">Servidor MCP</text>
+      <text class="n-sub" x="690" y="46">pid 492077</text>
+      <rect class="node n-box" x="795" y="10" width="150" height="44" rx="8"/>
+      <text class="n-name" x="870" y="30" style="font-size:14px">Contenedor</text>
+      <text class="n-sub" x="870" y="46">docker</text>
+
+      <!-- líneas de vida -->
+      <line class="life s-model"  x1="150" y1="54" x2="150" y2="672"/>
+      <line class="life s-agent"  x1="330" y1="54" x2="330" y2="672"/>
+      <line class="life s-worker" x1="510" y1="54" x2="510" y2="672"/>
+      <line class="life s-mcp"    x1="690" y1="54" x2="690" y2="672"/>
+      <line class="life s-box"    x1="870" y1="54" x2="870" y2="672"/>
+
+      <!-- números de paso -->
+      <g class="gutter">
+        <circle cx="28" cy="92" r="11"/><text x="28" y="96">1</text>
+        <circle cx="28" cy="134" r="11"/><text x="28" y="138">2</text>
+        <circle cx="28" cy="176" r="11"/><text x="28" y="180">3</text>
+        <circle cx="28" cy="218" r="11"/><text x="28" y="222">4</text>
+        <circle cx="28" cy="260" r="11"/><text x="28" y="264">5</text>
+        <circle cx="28" cy="302" r="11"/><text x="28" y="306">5</text>
+        <circle cx="28" cy="344" r="11"/><text x="28" y="348">6</text>
+        <circle cx="28" cy="386" r="11"/><text x="28" y="390">7</text>
+        <circle cx="28" cy="428" r="11"/><text x="28" y="432">8</text>
+        <circle cx="28" cy="470" r="11"/><text x="28" y="474">9</text>
+        <circle cx="28" cy="512" r="11"/><text x="28" y="516">9</text>
+        <circle cx="28" cy="554" r="11"/><text x="28" y="558">9</text>
+        <circle cx="28" cy="596" r="11"/><text x="28" y="600">9</text>
+        <circle cx="28" cy="638" r="11"/><text x="28" y="642">10</text>
+      </g>
+
+      <!-- 1 agente → qwen -->
+      <line class="edge s-agent" x1="330" y1="92" x2="153" y2="92" marker-end="url(#q-agent)"/>
+      <text class="e-label mid halo" x="240" y="85">conversación (≤ 6.000 tokens)</text>
+      <!-- 2 qwen → agente -->
+      <line class="edge reply s-model" x1="150" y1="134" x2="327" y2="134" marker-end="url(#q-model)"/>
+      <text class="e-label mid halo" x="240" y="127">Thought + bloque ```python</text>
+      <!-- 3 nota agente -->
+      <rect class="node n-agent" x="245" y="161" width="170" height="30" rx="6"/>
+      <text class="e-mono mid" x="330" y="180">extract_agent_code</text>
+      <!-- 4 agente → trabajador -->
+      <line class="edge s-agent" x1="330" y1="218" x2="507" y2="218" marker-end="url(#q-agent)"/>
+      <text class="e-mono mid halo" x="420" y="211">{"type": "execute"}</text>
+      <!-- 5 nota trabajador -->
+      <rect class="node n-worker" x="420" y="245" width="180" height="30" rx="6"/>
+      <text class="e-mono mid" x="510" y="264">exec → edit_file(…)</text>
+      <!-- 5 trabajador → agente -->
+      <line class="edge s-worker" x1="510" y1="302" x2="333" y2="302" marker-end="url(#q-worker)"/>
+      <text class="e-mono mid halo" x="420" y="295">{"type": "mcp_request"}</text>
+      <!-- 6 agente → mcp -->
+      <line class="edge s-agent" x1="330" y1="344" x2="687" y2="344" marker-end="url(#q-agent)"/>
+      <text class="e-mono mid halo" x="510" y="337">call_tool: edit_file</text>
+      <!-- 7 mcp → contenedor -->
+      <line class="edge s-mcp" x1="690" y1="386" x2="867" y2="386" marker-end="url(#q-mcp)"/>
+      <text class="e-label mid halo" x="780" y="379">docker exec … python -c</text>
+      <!-- 8 nota contenedor -->
+      <rect class="node n-box" x="795" y="413" width="150" height="30" rx="6"/>
+      <text class="e-label mid" x="870" y="432">edita __init__.py</text>
+      <!-- 9 vuelta -->
+      <line class="edge reply s-box" x1="870" y1="470" x2="693" y2="470" marker-end="url(#q-box)"/>
+      <text class="e-label mid halo" x="780" y="463">“Edit applied successfully.”</text>
+      <line class="edge reply s-mcp" x1="690" y1="512" x2="333" y2="512" marker-end="url(#q-mcp)"/>
+      <text class="e-mono mid halo" x="510" y="505">{"result": "Edit applied…"}</text>
+      <line class="edge reply s-agent" x1="330" y1="554" x2="507" y2="554" marker-end="url(#q-agent)"/>
+      <text class="e-mono mid halo" x="420" y="547">{"type": "mcp_result"}</text>
+      <line class="edge reply s-worker" x1="510" y1="596" x2="333" y2="596" marker-end="url(#q-worker)"/>
+      <text class="e-mono mid halo" x="420" y="589">output · done</text>
+      <!-- 10 nota agente -->
+      <rect class="node n-agent" x="215" y="623" width="230" height="30" rx="6"/>
+      <text class="e-mono mid" x="330" y="642">build_observation → historial</text>
+    </svg>
+    <p class="caption">Línea continua: petición. Línea discontinua: respuesta. La flecha tiene el color de quien envía. Los números son los pasos de la lista de abajo.</p>
+  </figure>
+
+  <ol class="steps">
+    <li>
+      <div class="route"><span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who model">Qwen</span> pregunta qué hacer</div>
+      <p>Envía la conversación: las instrucciones, la tarea y lo que pasó en las iteraciones 1 y 2. Con Qwen en Groq hay un tope de 6.000 tokens por petición. Si la conversación no cabe, <span class="fn">trim_history</span> envía las instrucciones, la tarea y los intercambios más recientes que quepan.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">run_agent_loop</span> <span class="ref">agent_loop.py:165</span> <span class="fn">trim_history</span> <span class="ref">agent_loop.py:26</span> <span class="fn">ProviderClient.complete</span> <span class="ref">providers.py:157</span> <span>SDK openai</span> <span class="ref">providers.py:330</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who model">Qwen</span> <span class="arrow">→</span> <span class="who agent">Agente</span> responde con texto</div>
+      <p>En esta iteración Groq contestó primero <strong>429</strong> (demasiadas peticiones por minuto con la clave 0). El cliente repitió la petición con la clave 1 y esta vez llegó la respuesta:</p>
+<pre>Thought: The fix is to add `using=db` to the save() call on line 27.
+
+```python
+print(edit_file(filepath="/testbed/django/contrib/contenttypes/management/__init__.py", old_str="                    content_type.save(update_fields={'model'})", new_str="                    content_type.save(using=db, update_fields={'model'})"))
+```</pre>
+      <div class="code-at"><span class="label">Código</span> <span>429 y cambio de clave</span> <span class="ref">providers.py:233</span> <span>tokens del paso en</span> <span class="fn">StepMetrics</span> <span class="ref">agent_loop.py:184</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> saca el código</div>
+      <p>Coge el primer bloque <code>```python</code> que llama a una herramienta. A partir de aquí ya no es texto: es código Python.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">extract_agent_code</span> <span class="ref">code_extraction.py:216</span> <span class="fn">_first_block_calling</span> <span class="ref">code_extraction.py:190</span> <span>se guarda en</span> <span class="ref">agent_loop.py:223</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who worker">Trabajador</span> «ejecuta esto»</div>
+      <p>Envía el código por una tubería (<em>Pipe</em>) como un diccionario de Python: <code>{"type": "execute", "code": …}</code>.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="ref">agent_loop.py:224</span> <span class="fn">SandboxSession.execute</span> <span class="ref">sandbox_session.py:97</span> <span>envío en</span> <span class="ref">sandbox_session.py:119</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who worker">Trabajador</span> ejecuta y pide la herramienta</div>
+      <p>Ejecuta el código con <code>exec</code>. Pero dentro del trabajador, <code>edit_file</code> <strong>no edita nada</strong>: es un telefonillo. Envía al agente «quiero llamar a <code>edit_file</code> con estos datos» (<code>mcp_request</code>) y se queda esperando la respuesta.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">execute_block</span> <span class="ref">sandbox.py:367</span> <span><code>exec</code> en</span> <span class="ref">sandbox.py:386</span> <span class="fn">tool_wrapper</span> <span class="ref">sandbox.py:312</span> <span class="fn">_request_mcp</span> <span class="ref">sandbox.py:289</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who mcp">Servidor MCP</span> pasa la petición</div>
+      <p>El agente ve el <code>mcp_request</code> y se lo da al cliente MCP. El cliente lo envía al servidor como <code>call_tool</code> por stdio.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="ref">sandbox_session.py:132</span> <span class="fn">_dispatch_mcp</span> <span class="ref">sandbox_session.py:31</span> <span class="fn">MCPClient.call</span> <span class="ref">mcp_client.py:256</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who mcp">Servidor MCP</span> <span class="arrow">→</span> <span class="who box">Contenedor</span> entra en el contenedor</div>
+      <p>El servidor ejecuta su función <code>edit_file</code>, que lanza esta orden. Los argumentos van separados, uno por uno; nunca se pegan en una cadena de shell. Así las comillas o los saltos de línea del modelo no pueden convertirse en otra orden.</p>
+<pre>docker exec -w /testbed agent-smith-8d023cd56c8e \
+    python -c "&lt;_EDIT_PROGRAM&gt;" \
+    /testbed/django/contrib/contenttypes/management/__init__.py \
+    "                    content_type.save(update_fields={'model'})" \
+    "                    content_type.save(using=db, update_fields={'model'})"</pre>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">edit_file</span> <span class="ref">mcp_tools_swebench.py:36</span> → <span class="fn">edit_file</span> <span class="ref">swebench_tools.py:248</span> → <span class="fn">_run_program</span> <span class="ref">swebench_tools.py:224</span> → <span class="fn">_run</span> <span class="ref">swebench_tools.py:186</span> <span><code>docker exec</code> en</span> <span class="ref">swebench_tools.py:195</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who box">Contenedor</span> cambia el fichero</div>
+      <p>Un programa Python pequeño hace el trabajo de verdad. Resumido:</p>
+<pre>content = path.read_text()
+count = content.count(old)          <span class="cm"># tiene que aparecer exactamente 1 vez</span>
+updated = content.replace(old, new, 1)
+compile(updated, str(path), "exec") <span class="cm"># si no compila, se rechaza</span>
+path.write_text(updated)
+print("Edit applied successfully.")</pre>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">_EDIT_PROGRAM</span> <span class="ref">swebench_tools.py:49</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who box">Contenedor</span> <span class="arrow">→</span> <span class="who mcp">MCP</span> <span class="arrow">→</span> <span class="who agent">Agente</span> <span class="arrow">→</span> <span class="who worker">Trabajador</span> vuelve la respuesta</div>
+      <p>Lo que imprime el contenedor recorre el camino al revés. Al trabajador le llega como el valor que devuelve <code>edit_file(…)</code>, el <code>print</code> lo muestra y el trabajador avisa al agente de que ha terminado (<code>done</code>).</p>
+      <div class="code-at"><span class="label">Código</span> <span>respuesta al trabajador</span> <span class="ref">sandbox_session.py:138</span> <span><code>done</code> en</span> <span class="ref">sandbox.py:406</span></div>
+    </li>
+    <li>
+      <div class="route"><span class="who agent">Agente</span> guarda la observación</div>
+      <p>Convierte la salida en <code>Observation: Edit applied successfully.</code> y la añade a la conversación junto con la respuesta de Qwen. Vuelve al paso 1: empieza la iteración 4.</p>
+      <div class="code-at"><span class="label">Código</span> <span class="fn">build_observation</span> <span class="ref">agent_loop.py:58</span> <span>llamado en</span> <span class="ref">agent_loop.py:233</span> <span>al historial en</span> <span class="ref">agent_loop.py:237</span></div>
+    </li>
+  </ol>
+
+  <div class="callout box">
+    <h3>Lo que ve el contenedor</h3>
+    <p>El contenedor solo participa en los pasos 7 y 8. No sabe que hay un modelo, ni MCP, ni un trabajador. Para él, alguien de fuera le dice «ejecuta este programa», y él lo ejecuta y devuelve lo que se imprime.</p>
+  </div>
+</section>
+
+<section id="tarea">
+  <div class="prose">
+    <h2>La tarea completa</h2>
+    <p>Las cinco iteraciones, con el <em>Thought</em> real de Qwen. Cada iteración hace un viaje completo como el de arriba. Los tokens de entrada crecen porque la conversación es cada vez más larga.</p>
+  </div>
+  <div class="table-wrap wide">
+    <table>
+      <thead>
+        <tr><th>Iter.</th><th>Qwen piensa</th><th>Código ejecutado</th><th>Dentro del contenedor</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">429</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">1</td><td><em>I'll locate the RenameContentType class…</em></td><td><code>search_function_or_class_definition_in_code(name="RenameContentType")</code></td><td>Un programa recorre <code>/testbed</code> buscando <code>class RenameContentType</code>. Está en <code>management/__init__.py</code>, línea 6.</td><td class="num">2.343</td><td class="num">41</td><td class="num">0</td></tr>
+        <tr><td class="num">2</td><td><em>Let me read the file to see the _rename method.</em></td><td><code>read_file(…, start_line=1, end_line=60)</code></td><td>Un programa imprime las líneas 1 a 60 numeradas.</td><td class="num">2.421</td><td class="num">52</td><td class="num">0</td></tr>
+        <tr><td class="num">3</td><td><em>The fix is to add <code>using=db</code> to the save() call on line 27.</em></td><td><code>edit_file(…, old_str=…, new_str=…)</code></td><td>Se modifica el fichero. <strong>Es el único cambio real.</strong></td><td class="num">3.169</td><td class="num">78</td><td class="num">1</td></tr>
+        <tr><td class="num">4</td><td><em>Let me run the tests to verify the fix.</em></td><td><code>run_tests()</code></td><td>Se ejecutan los 4 tests de la tarea: <code>Ran 4 tests … OK</code>. Tarda 4 segundos (ver la sección siguiente).</td><td class="num">3.268</td><td class="num">23</td><td class="num">0</td></tr>
+        <tr><td class="num">5</td><td><em>All tests pass. Let me submit the patch.</em></td><td><code>final_answer(get_patch())</code></td><td><code>git diff</code> devuelve el parche. <code>final_answer</code> no entra en el contenedor: es una función del trabajador.</td><td class="num">4.162</td><td class="num">22</td><td class="num">1</td></tr>
+        <tr><td></td><td><strong>Total</strong></td><td colspan="2">7 peticiones = 5 respuestas + 2 rechazos 429 que no gastan tokens.</td><td class="num"><strong>15.363</strong></td><td class="num"><strong>216</strong></td><td class="num">2</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
+    <h3>El resultado: un parche de una línea</h3>
+<pre>diff --git a/django/contrib/contenttypes/management/__init__.py b/django/contrib/contenttypes/management/__init__.py
+@@ -24,7 +24,7 @@ class RenameContentType(migrations.RunPython):
+             content_type.model = new_model
+             try:
+                 with transaction.atomic(using=db):
+<span class="del">-                    content_type.save(update_fields={'model'})</span>
+<span class="add">+                    content_type.save(using=db, update_fields={'model'})</span>
+             except IntegrityError:</pre>
+    <p>Antes de guardarlo, el agente comprueba que la respuesta contiene <code>diff --git</code>. Un modelo ya intentó entregar como solución el aviso «No changes yet.» sin haber cambiado nada. Después, la moulinette aplica el parche en <strong>su propio</strong> contenedor limpio y pasa los tests. Ahí sale el <span class="pass">PASSED</span>.</p>
+    <div class="code-at"><span class="label">Código</span> <span>comprobación del diff</span> <span class="ref">swebench_agent.py:299</span> <span>se escribe el JSON en</span> <span class="ref">agent_swebench.py:66</span></div>
+  </div>
+</section>
+
+<section id="tests">
+  <div class="prose">
+    <h2>Qué hace <code>run_tests</code> dentro del contenedor</h2>
+    <p>Es la herramienta que más trabajo hace dentro. Ejecuta el <code>eval_script</code> que trae la tarea con <code>/bin/bash</code>:</p>
+    <ol class="plain">
+      <li>Activa el entorno <code>conda</code> llamado <code>testbed</code> y configura el idioma.</li>
+      <li>Ejecuta <code>git status</code>, <code>git show</code> y <code>git diff</code>, solo para informar.</li>
+      <li>Ejecuta <code>pip install -e .</code> para instalar el Django de <code>/testbed</code>.</li>
+      <li>Con <code>git checkout</code> y <code>git apply</code> <strong>añade el test nuevo</strong> de la tarea, <code>test_existing_content_type_rename_other_database</code>. Es el que comprueba el fallo.</li>
+      <li>Ejecuta <code>./tests/runtests.py … contenttypes_tests.test_operations</code>, entre los marcadores <code>&gt;&gt;&gt;&gt;&gt; Start Test Output</code> y <code>End Test Output</code>.</li>
+      <li>Con <code>git checkout</code> <strong>deja el fichero de tests como estaba</strong>.</li>
+    </ol>
+    <p>Al modelo solo le llega lo que hay entre los dos marcadores. Por el paso 6, el <code>git diff</code> final contiene <strong>un solo fichero</strong>: el arreglo.</p>
+    <div class="code-at"><span class="label">Código</span> <span class="fn">run_tests</span> <span class="ref">swebench_tools.py:313</span> <span>recorte entre marcadores</span> <span class="ref">swebench_tools.py:341</span> <span class="fn">get_patch</span> <span class="ref">swebench_tools.py:348</span></div>
+  </div>
+</section>
+
+<section id="vida">
+  <div class="prose">
+    <h2>Cómo nace y cómo muere el contenedor</h2>
+    <p>Piensa en una <strong>llamada telefónica abierta</strong>. El contenedor vive mientras el agente mantenga la línea.</p>
+  </div>
+  <ol class="lifecycle">
+    <li>
+      <h3>Nace</h3>
+      <p>El único programa del contenedor es <code>cat</code>. Se queda escuchando su entrada, que es una tubería que sostiene el agente.</p>
+<pre>docker run -i --rm --name agent-smith-… \
+    --network none &lt;imagen&gt; cat</pre>
+      <div class="code-at"><span class="ref">swebench_agent.py:89</span></div>
+    </li>
+    <li>
+      <h3>Se comprueba</h3>
+      <p>El agente espera a que Docker diga que está en marcha y mira que existe <code>/testbed</code> con un <code>ls</code>.</p>
+      <div class="code-at"><span class="fn">_wait_until_running</span> <span class="ref">swebench_agent.py:102</span> <span class="ref">swebench_agent.py:97</span></div>
+    </li>
+    <li>
+      <h3>Trabaja</h3>
+      <p>Cada herramienta entra con <code>docker exec</code>, hace su trabajo y sale. Mientras tanto, <code>cat</code> sigue escuchando.</p>
+      <div class="code-at"><span class="fn">_run</span> <span class="ref">swebench_tools.py:195</span></div>
+    </li>
+    <li>
+      <h3>Muere</h3>
+      <p>El agente cierra la tubería: «cuelga». <code>cat</code> lo nota y termina, el contenedor se para y <code>--rm</code> lo borra. Por seguridad, después se lanza <code>docker rm -f</code>.</p>
+      <div class="code-at"><span class="fn">SWEEnvironment.close</span> <span class="ref">swebench_agent.py:142</span> <span class="ref">swebench_agent.py:152</span></div>
+    </li>
+  </ol>
+  <div class="callout box">
+    <h3>¿Y si el agente muere de golpe con <code>kill -9</code>?</h3>
+    <p>Un <code>kill -9</code> no deja ejecutar ningún <code>finally</code>. Pero el sistema operativo cierra todas las tuberías del proceso muerto, así que cuelga la línea por él y el contenedor desaparece igual. La hoja de evaluación comprueba exactamente esto.</p>
+  </div>
+  <div class="prose">
+    <h3>Orden de cierre al terminar la tarea</h3>
+    <p>En el <code>finally</code> se cierra primero el <span class="who worker">Trabajador</span>, después el <span class="who mcp">Servidor MCP</span> y por último el <span class="who box">Contenedor</span>. Pasa aunque la tarea haya fallado.</p>
+    <div class="code-at"><span class="label">Código</span> <span class="ref">swebench_agent.py:310</span> <span class="fn">SandboxSession.close</span> <span class="ref">sandbox_session.py:180</span> <span class="fn">MCPClient.close</span> <span class="ref">mcp_client.py:308</span> <span class="fn">SWEEnvironment.close</span> <span class="ref">swebench_agent.py:131</span></div>
+  </div>
+</section>
+
+<section id="porque">
+  <div class="prose">
+    <h2>¿Por qué tantas piezas?</h2>
+    <p>Cada una existe porque sin ella algo saldría mal:</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Si quitáramos…</th><th>pasaría que…</th></tr></thead>
+      <tbody>
+        <tr><td><span class="who agent">Agente</span></td><td>Nadie convertiría el texto del modelo en acciones.</td></tr>
+        <tr><td><span class="who worker">Trabajador</span></td><td>El código del modelo se ejecutaría en el mismo proceso que tus claves de API.</td></tr>
+        <tr><td><span class="who mcp">Servidor MCP</span></td><td>El código del modelo tendría que manejar Docker él mismo. Además, la asignatura exige herramientas MCP descubiertas, no escritas a mano en el código.</td></tr>
+        <tr><td><span class="who box">Contenedor</span></td><td>El modelo editaría y ejecutaría un proyecto en tu propio ordenador, sin el entorno correcto y con red.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="mapa">
+  <div class="prose">
+    <h2>Mapa de funciones</h2>
+    <p>Dónde está cada tarea importante, agrupado por proceso. Si necesitas cambiar algo, empieza buscando aquí.</p>
+  </div>
+  <div class="table-wrap wide">
+    <table>
+      <thead><tr><th>Fichero</th><th>Función</th><th>Qué hace</th></tr></thead>
+      <tbody>
+        <tr class="group agent"><td colspan="3">Agente · pid 491940</td></tr>
+        <tr><td class="file">agent_swebench.py</td><td><span class="fn">main</span> <span class="ref">:54</span></td><td>Lee la tarea, llama al adaptador y escribe el JSON del resultado.</td></tr>
+        <tr><td class="file">agent_smith/swebench_agent.py</td><td><span class="fn">run_swebench_agent</span> <span class="ref">:229</span></td><td>Monta las piezas en orden, llama al bucle y lo cierra todo en el <code>finally</code>.</td></tr>
+        <tr><td class="file">agent_smith/swebench_agent.py</td><td><span class="fn">SWEEnvironment.start</span> <span class="ref">:71</span> <span class="fn">close</span> <span class="ref">:131</span></td><td>Crea y elimina el contenedor.</td></tr>
+        <tr><td class="file">agent_smith/swebench_agent.py</td><td><span class="fn">build_swebench_system_prompt</span> <span class="ref">:162</span></td><td>Instrucciones fijas más el manual de herramientas.</td></tr>
+        <tr><td class="file">agent_smith/agent_loop.py</td><td><span class="fn">run_agent_loop</span> <span class="ref">:96</span></td><td>El bucle <em>Thought → Code → Observation</em>. Cuenta peticiones y tokens.</td></tr>
+        <tr><td class="file">agent_smith/agent_loop.py</td><td><span class="fn">trim_history</span> <span class="ref">:26</span></td><td>Elige qué parte de la conversación se envía.</td></tr>
+        <tr><td class="file">agent_smith/agent_loop.py</td><td><span class="fn">build_observation</span> <span class="ref">:58</span></td><td>Convierte el resultado del bloque en el texto <code>Observation</code>.</td></tr>
+        <tr><td class="file">agent_smith/providers.py</td><td><span class="fn">ProviderClient.complete</span> <span class="ref">:157</span></td><td>Pide una respuesta al modelo. Reintenta y cambia de clave con un 429.</td></tr>
+        <tr><td class="file">agent_smith/code_extraction.py</td><td><span class="fn">extract_agent_code</span> <span class="ref">:216</span></td><td>Saca el código Python de la respuesta del modelo.</td></tr>
+        <tr><td class="file">agent_smith/sandbox_session.py</td><td><span class="fn">SandboxSession.start</span> <span class="ref">:61</span> <span class="fn">execute</span> <span class="ref">:97</span></td><td>Arranca el trabajador, le manda cada bloque y atiende sus peticiones MCP.</td></tr>
+        <tr><td class="file">agent_smith/mcp_client.py</td><td><span class="fn">MCPClient.start</span> <span class="ref">:189</span> <span class="fn">call</span> <span class="ref">:256</span></td><td>Abre la sesión MCP y descubre las herramientas. Ejecuta cada llamada.</td></tr>
+        <tr class="group worker"><td colspan="3">Trabajador · pid 492082</td></tr>
+        <tr><td class="file">agent_smith/sandbox.py</td><td><span class="fn">worker_main</span> <span class="ref">:411</span></td><td>Borra el entorno (las claves), aplica límites, prepara las variables y espera bloques.</td></tr>
+        <tr><td class="file">agent_smith/sandbox.py</td><td><span class="fn">execute_block</span> <span class="ref">:367</span></td><td>Ejecuta un bloque con <code>exec</code> (línea 386) y responde <code>done</code>.</td></tr>
+        <tr><td class="file">agent_smith/sandbox.py</td><td><span class="fn">_make_tool_wrapper</span> <span class="ref">:306</span> <span class="fn">_request_mcp</span> <span class="ref">:289</span></td><td>Las herramientas «telefonillo» que piden el trabajo al agente.</td></tr>
+        <tr><td class="file">agent_smith/sandbox.py</td><td><span class="fn">final_answer</span> <span class="ref">:71</span></td><td>Termina la tarea con la respuesta. No pasa por MCP.</td></tr>
+        <tr class="group mcp"><td colspan="3">Servidor MCP · pid 492077</td></tr>
+        <tr><td class="file">mcp_tools_swebench.py</td><td><span class="fn">@mcp.tool</span> <span class="ref">:19–153</span></td><td>Publica las 9 herramientas con su descripción. Cada una llama a <code>swebench_tools</code>.</td></tr>
+        <tr><td class="file">agent_smith/swebench_tools.py</td><td><span class="fn">_run</span> <span class="ref">:186</span></td><td>Todas las órdenes pasan por aquí y se convierten en <code>docker exec</code>.</td></tr>
+        <tr><td class="file">agent_smith/swebench_tools.py</td><td><span class="fn">read_file</span> <span class="ref">:241</span> <span class="fn">edit_file</span> <span class="ref">:248</span></td><td>Leen y editan con pequeños programas Python que se ejecutan en el contenedor.</td></tr>
+        <tr><td class="file">agent_smith/swebench_tools.py</td><td><span class="fn">run_tests</span> <span class="ref">:313</span> <span class="fn">get_patch</span> <span class="ref">:348</span></td><td>Ejecutan los tests de la tarea y el <code>git diff</code>.</td></tr>
+        <tr class="group box"><td colspan="3">Contenedor</td></tr>
+        <tr><td class="file">—</td><td>—</td><td>No tiene código nuestro. Solo ejecuta <code>cat</code> y las órdenes que le llegan por <code>docker exec</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">Números de línea comprobados el 5 de octubre de 2026. Cambian cuando se edita el fichero, así que busca siempre por el nombre de la función.</p>
+</section>
+
+<section id="repetir">
+  <div class="prose">
+    <h2>Repetirlo y leer el log</h2>
+    <p>Primero, desde la carpeta de la moulinette, se guarda la tarea:</p>
+<pre>uv run moulinette_eval dump swebench --task-id django__django-11066 --output task.json</pre>
+    <p>Después, desde la raíz de este repositorio y con <code>task.json</code> copiado allí, se lanza el agente con el modo DEBUG y el log en un fichero conocido:</p>
+<pre>AGENT_SMITH_LOG_LEVEL=DEBUG \
+AGENT_SMITH_LOG_FILE=$PWD/debug.log \
+uv run --env-file .env python -m agent_swebench \
+  --task-file task.json --output solution.json \
+  --model-name qwen/qwen3.8-27b --provider-url https://api.groq.com/openai/v1</pre>
+    <p>Para validar el resultado, desde la carpeta de la moulinette:</p>
+<pre>uv run moulinette_eval validate swebench task.json solution.json</pre>
+    <p>En la ejecución de esta página, el log completo tenía 3.757 líneas. Para no perderte, fíltralo así:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Quiero ver…</th><th>Orden</th></tr></thead>
+        <tbody>
+          <tr><td>El esqueleto, sin las líneas «Entrando en…»</td><td><code>grep -E " (INFO|WARNING|ERROR) " debug.log</code></td></tr>
+          <tr><td>Solo lo que hace el trabajador (en tu ejecución, su <code>pid</code> será otro)</td><td><code>grep "pid=492082" debug.log</code></td></tr>
+          <tr><td>Las respuestas de Qwen</td><td><code>grep -A8 "Respuesta del modelo" debug.log</code></td></tr>
+          <tr><td>Las llamadas a herramientas</td><td><code>grep -A6 "MCP ENVIADO" debug.log</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <h3>Lo que el log no dice</h3>
+      <p>Para cada orden del contenedor, el log solo apunta <code>Ejecutando en el testbed: docker</code>, no la orden completa. Las órdenes de esta página salen de leer el código (<span class="ref">swebench_tools.py:199</span>).</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Ejecución real del 5 de octubre de 2026, de 17:17:52 a 17:18:02.</p>
+  <p>Para más contexto, consulta <code>GUIDE.md</code>: secciones 8 (Docker), 18 (qué cambia en SWE-bench) y 23 (Docker en Agent Smith).</p>
+</footer>
+
+</div>
+</body>
+</html>

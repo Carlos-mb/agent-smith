@@ -1,0 +1,12 @@
+Iterations: 30 / 30 OK
+Input tokens: 270596 / 300000 OK
+Output tokens: 1841 / 10000 OK
+Time: 136.7s / 900.0s OK
+Metrics: VALID
+
+============================================================
+FINAL RESULT
+============================================================
+Correctness: FAILED
+Metrics: VALID
+Overall: FAILED

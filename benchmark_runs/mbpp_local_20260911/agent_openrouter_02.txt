@@ -1,0 +1,12 @@
+[09/11/26 23:48:44] INFO     Processing request of type            server.py:720
+                             ListToolsRequest                                   
+                    INFO     Processing request of type            server.py:720
+                             ListResourcesRequest                               
+                    INFO     Processing request of type            server.py:720
+                             ListResourceTemplatesRequest                       
+                    INFO     Processing request of type            server.py:720
+                             ListPromptsRequest                                 
+[09/11/26 23:48:45] INFO     Processing request of type            server.py:720
+                             CallToolRequest                                    
+[09/11/26 23:48:53] INFO     Processing request of type            server.py:720
+                             CallToolRequest                                    

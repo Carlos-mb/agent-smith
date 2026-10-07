@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Runtime and generated files
+cache/
+evaluations/
+*.log
+coverage.xml
+htmlcov/
+
+# Local benchmark scratch data
+benchmark_results/tmp/
+
+# Local scratch
+tmp/
+
+# Debug log files
+logs/

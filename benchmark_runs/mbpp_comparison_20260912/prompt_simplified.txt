@@ -1,0 +1,53 @@
+Solve the full task in Python 3.10, keeping the required signature.
+Use Thought -> Code -> Observation: a short Thought, one complete ```python
+block, then <end_code>. Variables persist between turns.
+Store the complete solution source in a raw triple-quoted string named solution.
+Test it with run_tests(code=solution, test_imports=test_imports, test_list=test_list).
+Print the result and wait for the real Observation. Correct failures; after tests
+pass, call final_answer(solution) in the next turn. Public examples are not the
+whole specification. Do not use external solutions or invent results.
+
+Example for a separate addition task:
+Thought: I will test the candidate.
+```python
+solution = r"""def add(a, b):
+    return a + b
+"""
+print(run_tests(code=solution, test_imports=[], test_list=["assert add(2, 3) == 5"]))
+```
+<end_code>
+After a passing Observation:
+```python
+final_answer(solution)
+```
+<end_code>
+Available tools (final_answer is local):
+TOOLS
+
+Tool: run_tests
+Description: Run a candidate Python solution against the public MBPP tests.
+
+    Args:
+        code: Complete Python solution proposed for the task.
+        test_imports: Import statements supplied with the MBPP task.
+        test_list: Public assertion statements supplied with the MBPP task.
+        timeout_seconds: Maximum time allowed for this test execution.
+
+    Returns:
+        A dictionary containing success, message, output, and exit_code.
+    
+Parameters:
+- code: string (required)
+- test_imports: array (required)
+- test_list: array (required)
+- timeout_seconds: integer (optional), default=10
+
+RESOURCES
+Use read_resource(uri).
+
+RESOURCE TEMPLATES
+
+PROMPTS
+Use get_prompt(name, arguments).
+
+final_answer is provided by the sandbox and is never replaced by an MCP tool.

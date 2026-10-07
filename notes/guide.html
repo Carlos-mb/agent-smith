@@ -1,0 +1,2970 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Smith Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --ground: #F3F5F8;
+  --surface: #E6EAF0;
+  --ink: #141A24;
+  --muted: #586273;
+  --rule: #D3D9E2;
+  --accent: #1D4F91;
+  --accent-soft: #DCE6F4;
+  --code-bg: #E6EAF0;
+  --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --cond: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #10141B;
+    --surface: #1A2029;
+    --ink: #E4E8EF;
+    --muted: #9AA4B4;
+    --rule: #2A3240;
+    --accent: #8FB4EC;
+    --accent-soft: #1C2A40;
+    --code-bg: #1A2029;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #10141B;
+  --surface: #1A2029;
+  --ink: #E4E8EF;
+  --muted: #9AA4B4;
+  --rule: #2A3240;
+  --accent: #8FB4EC;
+  --accent-soft: #1C2A40;
+  --code-bg: #1A2029;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.66;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+.pagina {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 64px;
+}
+
+/* Índice lateral */
+.lateral {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding-block: 40px 24px;
+}
+.lateral .marca {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.toc a {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  color: var(--muted);
+  text-decoration: none;
+  font-family: var(--cond);
+  font-size: 15px;
+  line-height: 1.3;
+}
+.toc a:hover { color: var(--ink); background: var(--surface); }
+.toc a[aria-current="true"] { color: var(--accent); background: var(--accent-soft); }
+.toc .num { font-variant-numeric: tabular-nums; font-weight: 600; }
+.toc code { font-size: 0.9em; }
+
+.movil { display: none; }
+
+/* Columna de lectura */
+main { max-width: 70ch; padding-block: 40px 0; }
+
+.cabecera { padding-block: 8px 28px; border-bottom: 1px solid var(--rule); }
+.cabecera .sobre {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.cabecera h1 {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: clamp(38px, 6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.cabecera p { margin: 0 0 14px; }
+
+.atajo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-top: 22px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: 6px;
+  font-family: var(--cond);
+  font-size: 16px;
+}
+.atajo strong { font-weight: 600; }
+
+section { padding-top: 44px; }
+section + section { margin-top: 12px; border-top: 1px solid var(--rule); }
+
+h2 {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 1.12;
+  margin: 0 0 22px;
+  text-wrap: balance;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; }
+h3 {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.25;
+  margin: 34px 0 10px;
+  text-wrap: balance;
+}
+p { margin: 0 0 16px; }
+ul, ol { margin: 0 0 18px; padding-left: 1.3em; }
+li { margin-bottom: 6px; }
+li > p { margin-bottom: 6px; }
+strong { font-weight: 600; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border-radius: 3px;
+  overflow-wrap: anywhere;
+}
+pre {
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+pre code { background: none; padding: 0; font-size: 13.5px; overflow-wrap: normal; }
+
+blockquote {
+  margin: 0 0 18px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--rule);
+  color: var(--muted);
+}
+blockquote p { margin-bottom: 6px; }
+
+.tabla { overflow-x: auto; margin: 0 0 22px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.45; }
+th {
+  text-align: left;
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--ink);
+}
+td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Índice dentro del cuerpo */
+.ind-lista { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 4px; }
+.ind-lista li {
+  display: grid;
+  grid-template-columns: minmax(0, 17em) minmax(0, 1fr);
+  gap: 4px 20px;
+  padding-block: 8px;
+  border-bottom: 1px solid var(--rule);
+  margin: 0;
+}
+.ind-lista a { display: flex; gap: 10px; text-decoration: none; color: var(--ink); font-family: var(--cond); font-weight: 600; }
+.ind-lista a:hover .ind-titulo { color: var(--accent); }
+.ind-lista .num { color: var(--accent); min-width: 1.4em; font-variant-numeric: tabular-nums; }
+.ind-desc { color: var(--muted); font-size: 15.5px; }
+
+/* Partes */
+.parte { padding-top: 72px; margin-top: 12px; border-top: 3px solid var(--ink); }
+.parte-etiqueta {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 6px;
+}
+h2.parte-titulo { font-size: clamp(34px, 5vw, 44px); line-height: 1.05; margin-bottom: 18px; }
+.parte + section { border-top: none; margin-top: 0; }
+.toc .toc-parte a {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.toc .toc-parte:first-child a { margin-top: 0; }
+h3.ind-grupo { margin: 26px 0 6px; font-size: 19px; }
+h3.ind-grupo a { text-decoration: none; }
+.ind-nota { font-family: var(--serif); font-weight: 400; font-style: italic; font-size: 15px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .pagina { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .lateral { display: none; }
+  .movil {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin-inline: -20px;
+    padding: 10px 20px;
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+  }
+  .movil summary {
+    cursor: pointer;
+    font-family: var(--cond);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .movil .toc { margin-top: 10px; max-height: 60vh; overflow-y: auto; }
+  main { padding-top: 20px; }
+  h2 { font-size: 27px; }
+  .ind-lista li { grid-template-columns: minmax(0, 1fr); }
+  .ind-desc { padding-left: calc(1.4em + 10px); }
+}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <nav class="lateral" aria-label="Sections">
+    <p class="marca">Agent Smith Guide</p>
+    <ol class="toc"><li class="toc-parte"><a href="#p-before-you-start">Before you start</a></li><li><a href="#s-what-you-will-face"><span class="num">·</span><span>What you will face</span></a></li><li><a href="#s-an-order-of-work-that-keeps-frustration-low"><span class="num">·</span><span>An order of work that keeps frustration low</span></a></li><li><a href="#s-advice-that-saves-frustration"><span class="num">·</span><span>Advice that saves frustration</span></a></li><li class="toc-parte"><a href="#p-part-i">Part I</a></li><li><a href="#s1"><span class="num">1</span><span>What a coding AI agent is</span></a></li><li><a href="#s2"><span class="num">2</span><span>What an agent framework is</span></a></li><li><a href="#s3"><span class="num">3</span><span>Talking to an AI model through an API</span></a></li><li><a href="#s4"><span class="num">4</span><span>Common problems with free APIs</span></a></li><li><a href="#s5"><span class="num">5</span><span>What MCP is</span></a></li><li><a href="#s6"><span class="num">6</span><span>What a sandbox is</span></a></li><li><a href="#s7"><span class="num">7</span><span>Processes and inter-process communication</span></a></li><li><a href="#s8"><span class="num">8</span><span>Docker essentials</span></a></li><li><a href="#s9"><span class="num">9</span><span>What MBPP is</span></a></li><li><a href="#s10"><span class="num">10</span><span>What SWE-bench is</span></a></li><li><a href="#s11"><span class="num">11</span><span>How an agent is evaluated</span></a></li><li class="toc-parte"><a href="#p-part-ii">Part II</a></li><li><a href="#s12"><span class="num">12</span><span>What the subject asks for</span></a></li><li><a href="#s13"><span class="num">13</span><span>The working environment</span></a></li><li><a href="#s14"><span class="num">14</span><span>The three commands</span></a></li><li><a href="#s15"><span class="num">15</span><span>Architecture: three processes</span></a></li><li><a href="#s16"><span class="num">16</span><span>How the processes communicate</span></a></li><li><a href="#s17"><span class="num">17</span><span>An MBPP task step by step</span></a></li><li><a href="#s18"><span class="num">18</span><span>What changes for SWE-bench</span></a></li><li><a href="#s19"><span class="num">19</span><span>The loop in detail</span></a></li><li><a href="#s20"><span class="num">20</span><span>Design decisions</span></a></li><li><a href="#s21"><span class="num">21</span><span>Extracting code from the response</span></a></li><li><a href="#s22"><span class="num">22</span><span>Sandbox controls</span></a></li><li><a href="#s23"><span class="num">23</span><span>Docker in Agent Smith</span></a></li><li><a href="#s24"><span class="num">24</span><span>The provider</span></a></li><li class="toc-parte"><a href="#p-part-iii">Part III</a></li><li><a href="#s25"><span class="num">25</span><span>SWE-bench from start to finish</span></a></li><li class="toc-parte"><a href="#p-part-iv">Part IV</a></li><li><a href="#s26"><span class="num">26</span><span>Free models in practice</span></a></li><li><a href="#s27"><span class="num">27</span><span>Choosing a model</span></a></li><li><a href="#s28"><span class="num">28</span><span>What measuring the agent taught</span></a></li><li><a href="#s29"><span class="num">29</span><span>Bugs that looked like model failures</span></a></li><li><a href="#s30"><span class="num">30</span><span>Running on shared machines with rootless Docker</span></a></li><li><a href="#s31"><span class="num">31</span><span>Stopping the agent</span></a></li><li><a href="#s32"><span class="num">32</span><span>A working method</span></a></li></ol>
+  </nav>
+
+  <main>
+    <details class="movil" id="indice-movil">
+      <summary>Sections</summary>
+      <ol class="toc"><li class="toc-parte"><a href="#p-before-you-start">Before you start</a></li><li><a href="#s-what-you-will-face"><span class="num">·</span><span>What you will face</span></a></li><li><a href="#s-an-order-of-work-that-keeps-frustration-low"><span class="num">·</span><span>An order of work that keeps frustration low</span></a></li><li><a href="#s-advice-that-saves-frustration"><span class="num">·</span><span>Advice that saves frustration</span></a></li><li class="toc-parte"><a href="#p-part-i">Part I</a></li><li><a href="#s1"><span class="num">1</span><span>What a coding AI agent is</span></a></li><li><a href="#s2"><span class="num">2</span><span>What an agent framework is</span></a></li><li><a href="#s3"><span class="num">3</span><span>Talking to an AI model through an API</span></a></li><li><a href="#s4"><span class="num">4</span><span>Common problems with free APIs</span></a></li><li><a href="#s5"><span class="num">5</span><span>What MCP is</span></a></li><li><a href="#s6"><span class="num">6</span><span>What a sandbox is</span></a></li><li><a href="#s7"><span class="num">7</span><span>Processes and inter-process communication</span></a></li><li><a href="#s8"><span class="num">8</span><span>Docker essentials</span></a></li><li><a href="#s9"><span class="num">9</span><span>What MBPP is</span></a></li><li><a href="#s10"><span class="num">10</span><span>What SWE-bench is</span></a></li><li><a href="#s11"><span class="num">11</span><span>How an agent is evaluated</span></a></li><li class="toc-parte"><a href="#p-part-ii">Part II</a></li><li><a href="#s12"><span class="num">12</span><span>What the subject asks for</span></a></li><li><a href="#s13"><span class="num">13</span><span>The working environment</span></a></li><li><a href="#s14"><span class="num">14</span><span>The three commands</span></a></li><li><a href="#s15"><span class="num">15</span><span>Architecture: three processes</span></a></li><li><a href="#s16"><span class="num">16</span><span>How the processes communicate</span></a></li><li><a href="#s17"><span class="num">17</span><span>An MBPP task step by step</span></a></li><li><a href="#s18"><span class="num">18</span><span>What changes for SWE-bench</span></a></li><li><a href="#s19"><span class="num">19</span><span>The loop in detail</span></a></li><li><a href="#s20"><span class="num">20</span><span>Design decisions</span></a></li><li><a href="#s21"><span class="num">21</span><span>Extracting code from the response</span></a></li><li><a href="#s22"><span class="num">22</span><span>Sandbox controls</span></a></li><li><a href="#s23"><span class="num">23</span><span>Docker in Agent Smith</span></a></li><li><a href="#s24"><span class="num">24</span><span>The provider</span></a></li><li class="toc-parte"><a href="#p-part-iii">Part III</a></li><li><a href="#s25"><span class="num">25</span><span>SWE-bench from start to finish</span></a></li><li class="toc-parte"><a href="#p-part-iv">Part IV</a></li><li><a href="#s26"><span class="num">26</span><span>Free models in practice</span></a></li><li><a href="#s27"><span class="num">27</span><span>Choosing a model</span></a></li><li><a href="#s28"><span class="num">28</span><span>What measuring the agent taught</span></a></li><li><a href="#s29"><span class="num">29</span><span>Bugs that looked like model failures</span></a></li><li><a href="#s30"><span class="num">30</span><span>Running on shared machines with rootless Docker</span></a></li><li><a href="#s31"><span class="num">31</span><span>Stopping the agent</span></a></li><li><a href="#s32"><span class="num">32</span><span>A working method</span></a></li></ol>
+    </details>
+
+    <header class="cabecera">
+      <p class="sobre">Agent Smith · 42 · updated 7 October 2026</p>
+      <h1>Agent Smith Guide</h1>
+      <p class="atajo"><strong>New to the project?</strong>
+        <a href="#p-before-you-start">Before you start</a>
+        <a href="#p-part-iv">Lessons learned</a>
+        <a href="#s25">A SWE-bench task from start to finish</a></p>
+    </header>
+
+    <section id="contents" class="indice"><h2>Contents</h2><h3 class="ind-grupo"><a href="#p-before-you-start">Before you start</a> <span class="ind-nota">what the project asks of you, an order of work that keeps frustration low, and advice.</span></h3><h3 class="ind-grupo">Part I. Background concepts</h3><ol class="ind-lista"><li><a href="#s1"><span class="num">1</span><span class="ind-titulo">What a coding AI agent is</span></a><span class="ind-desc">the Thought → Code → Observation loop.</span></li><li><a href="#s2"><span class="num">2</span><span class="ind-titulo">What an agent framework is</span></a><span class="ind-desc">and why this project cannot use one.</span></li><li><a href="#s3"><span class="num">3</span><span class="ind-titulo">Talking to an AI model through an API</span></a><span class="ind-desc">messages, tokens, <code>usage</code> and HTTP status codes.</span></li><li><a href="#s4"><span class="num">4</span><span class="ind-titulo">Common problems with free APIs</span></a><span class="ind-desc">limits, quotas and unusual responses.</span></li><li><a href="#s5"><span class="num">5</span><span class="ind-titulo">What MCP is</span></a><span class="ind-desc">servers, clients, tools and transports.</span></li><li><a href="#s6"><span class="num">6</span><span class="ind-titulo">What a sandbox is</span></a><span class="ind-desc">running someone else's code safely.</span></li><li><a href="#s7"><span class="num">7</span><span class="ind-titulo">Processes and inter-process communication</span></a><span class="ind-desc">pipes, signals and asynchronous programming.</span></li><li><a href="#s8"><span class="num">8</span><span class="ind-titulo">Docker essentials</span></a><span class="ind-desc">images, containers and orphaned containers.</span></li><li><a href="#s9"><span class="num">9</span><span class="ind-titulo">What MBPP is</span></a><span class="ind-desc">short Python exercises with tests.</span></li><li><a href="#s10"><span class="num">10</span><span class="ind-titulo">What SWE-bench is</span></a><span class="ind-desc">real issues from real projects.</span></li><li><a href="#s11"><span class="num">11</span><span class="ind-titulo">How an agent is evaluated</span></a><span class="ind-desc">metrics, comparisons and ablations.</span></li></ol><h3 class="ind-grupo">Part II. Inside Agent Smith</h3><ol class="ind-lista"><li><a href="#s12"><span class="num">12</span><span class="ind-titulo">What the subject asks for</span></a><span class="ind-desc">the requirements, listed.</span></li><li><a href="#s13"><span class="num">13</span><span class="ind-titulo">The working environment</span></a><span class="ind-desc">the repository and the moulinette.</span></li><li><a href="#s14"><span class="num">14</span><span class="ind-titulo">The three commands</span></a><span class="ind-desc">what each one is for and which processes it starts.</span></li><li><a href="#s15"><span class="num">15</span><span class="ind-titulo">Architecture: three processes</span></a><span class="ind-desc">what each one does and what it cannot see.</span></li><li><a href="#s16"><span class="num">16</span><span class="ind-titulo">How the processes communicate</span></a><span class="ind-desc">the messages and the journey of a tool call.</span></li><li><a href="#s17"><span class="num">17</span><span class="ind-titulo">An MBPP task step by step</span></a><span class="ind-desc">from the command to the result file.</span></li><li><a href="#s18"><span class="num">18</span><span class="ind-titulo">What changes for SWE-bench</span></a><span class="ind-desc">container, tools and patch.</span></li><li><a href="#s19"><span class="num">19</span><span class="ind-titulo">The loop in detail</span></a><span class="ind-desc">limits, counters, errors and the model's memory.</span></li><li><a href="#s20"><span class="num">20</span><span class="ind-titulo">Design decisions</span></a><span class="ind-desc">what was chosen, over what, and why.</span></li><li><a href="#s21"><span class="num">21</span><span class="ind-titulo">Extracting code from the response</span></a><span class="ind-desc">the requested format and the ones that arrive.</span></li><li><a href="#s22"><span class="num">22</span><span class="ind-titulo">Sandbox controls</span></a><span class="ind-desc">what is restricted, how, and what is left out.</span></li><li><a href="#s23"><span class="num">23</span><span class="ind-titulo">Docker in Agent Smith</span></a><span class="ind-desc">one container per test run, one per task, and <code>kill -9</code>.</span></li><li><a href="#s24"><span class="num">24</span><span class="ind-titulo">The provider</span></a><span class="ind-desc">model selection, keys, retries and usage.</span></li></ol><h3 class="ind-grupo">Part III. A SWE-bench task from start to finish</h3><ol class="ind-lista"><li><a href="#s25"><span class="num">25</span><span class="ind-titulo">SWE-bench from start to finish</span></a><span class="ind-desc">from the task and the image to validation, with a real example.</span></li></ol><h3 class="ind-grupo">Part IV. Lessons learned</h3><ol class="ind-lista"><li><a href="#s26"><span class="num">26</span><span class="ind-titulo">Free models in practice</span></a><span class="ind-desc">catalogues that change, quotas and what each refusal means.</span></li><li><a href="#s27"><span class="num">27</span><span class="ind-titulo">Choosing a model</span></a><span class="ind-desc">what a comparison of ten models showed, and how far to trust it.</span></li><li><a href="#s28"><span class="num">28</span><span class="ind-titulo">What measuring the agent taught</span></a><span class="ind-desc">where iterations go, and which changes helped.</span></li><li><a href="#s29"><span class="num">29</span><span class="ind-titulo">Bugs that looked like model failures</span></a><span class="ind-desc">and how replaying saved runs exposed them.</span></li><li><a href="#s30"><span class="num">30</span><span class="ind-titulo">Running on shared machines with rootless Docker</span></a><span class="ind-desc">disk, images, CPU limits and file owners.</span></li><li><a href="#s31"><span class="num">31</span><span class="ind-titulo">Stopping the agent</span></a><span class="ind-desc">every way of killing it, and what happens to the container.</span></li><li><a href="#s32"><span class="num">32</span><span class="ind-titulo">A working method</span></a><span class="ind-desc">habits that saved time.</span></li></ol></section>
+
+    <div class="parte" id="p-before-you-start"><p class="parte-etiqueta">Start here</p><h2 class="parte-titulo">Before you start</h2></div><section id="s-what-you-will-face"><h2><span class="h2-texto">What you will face</span></h2><ul>
+<li><strong>A project with many moving parts.</strong> Three commands, three cooperating processes, an MCP server
+  for each benchmark, Docker, a provider client with several keys, usage tracking, and a benchmark
+  report comparing at least five models, with an ablation. Agent Smith ended up at about 3,800
+  lines of Python, tests not included. Most of the time does not go into writing code: it goes into
+  understanding how the pieces talk to each other, waiting for providers and measuring.</li>
+<li><strong>Two benchmarks of very different size.</strong> An MBPP task is one small function, with 10
+  iterations, 6,000 input tokens and 120 seconds. A SWE-bench task is a real bug in a real project,
+  such as django or sympy, inside a Docker image of several gigabytes, with 30 iterations, 300,000
+  input tokens and 900 seconds (section <a href="#s12">12</a>).</li>
+<li><strong>Free models only.</strong> Quotas, waits, empty answers and models that disappear from one week to the
+  next are part of the work, not accidents (section <a href="#s26">26</a>). The subject forbids paying, so there is no
+  shortcut.</li>
+<li><strong>Disk space and downloads.</strong> Each SWE-bench image takes between 4 and 7.6 GB, and you will want
+  several. On the school machines Docker runs rootless and needs some setup first (section <a href="#s30">30</a>).</li>
+<li><strong>How the work is checked.</strong> The moulinette validates the <code>solution.json</code> files your agent
+  writes, both the answer and the metrics; it never runs your code (section <a href="#s13">13</a>). The project is
+  also tested with scripts that exercise the sandbox and run the agent on MBPP tasks and on
+  SWE-bench tasks from real repositories. In the evaluation you explain your own design, and the
+  subject warns that you will make small changes to your agent on the spot. Every line has to be
+  one you understand.</li>
+<li><strong>Every number must be real.</strong> Token counts come from what the provider reports, and the report
+  needs the <code>solution.json</code> files behind its figures (section <a href="#s12-7">12.7</a>).</li>
+</ul></section><section id="s-an-order-of-work-that-keeps-frustration-low"><h2><span class="h2-texto">An order of work that keeps frustration low</span></h2><p>Each step can be tested before the next one exists, so when something fails there is only one new
+piece to suspect.</p>
+<ol>
+<li><strong>Read the subject's data models and limits</strong> (section <a href="#s12">12</a>), and make the agent write its result
+   file from the first day, also when a task fails. A run that crashes before writing it is worth
+   nothing.</li>
+<li><strong>Build the sandbox without any model.</strong> The worker process, its restrictions and the <code>sandbox</code>
+   command (section <a href="#s14-2">14.2</a>) can be tested with code you type yourself.</li>
+<li><strong>Add MCP with the smallest server you can write</strong>: one tool that adds two numbers, first over
+   stdio, then over HTTP. Then generate the manual from its schema (section <a href="#s5-6">5.6</a>).</li>
+<li><strong>Write the MBPP tool and try it without a model</strong>: give it a correct function and a wrong one,
+   and read what it answers.</li>
+<li><strong>Only then connect a model</strong>, on one MBPP task, and validate the result with the moulinette.
+   Keep that task as a quick check after every change.</li>
+<li><strong>For SWE-bench, test the nine tools by hand before writing the loop</strong>: start a task container,
+   then read, search, edit, run the tests and get the patch. Tools that can also work on a plain
+   folder are much easier to test (section <a href="#s23-2">23.2</a>).</li>
+<li><strong>Run the SWE-bench loop on an easy task first</strong>, such as the one in section <a href="#s25">25</a>.</li>
+<li><strong>Keep every <code>solution.json</code> from the beginning.</strong> Each one is a future data point for the
+   report, and replaying them finds bugs (sections <a href="#s29-1">29.1</a> and <a href="#s32">32</a>).</li>
+</ol></section><section id="s-advice-that-saves-frustration"><h2><span class="h2-texto">Advice that saves frustration</span></h2><ul>
+<li><strong>Keep the code small and synchronous.</strong> You will have to explain all of it. The official MCP SDK
+  is asynchronous, so keep that part inside the MCP client (section <a href="#s15-2">15.2</a>). Use the provider's
+  official SDK with its own retries disabled, so that you count every request (section <a href="#s24-3">24.3</a>).</li>
+<li><strong>Write tests with scripted model replies</strong>, so the test suite never spends quota and always gives
+  the same result.</li>
+<li><strong>When something goes wrong, log everything to a file.</strong> Read the model's reply (<code>llm_output</code>)
+  next to the code that actually ran (<code>sandbox_input</code>): several "model failures" in this project
+  were bugs in the agent (section <a href="#s29">29</a>).</li>
+<li><strong>Get keys from several providers in the first week</strong>, and check each model with one request
+  before relying on it (section <a href="#s26-1">26.1</a>).</li>
+<li><strong>Configure stop sequences for each model</strong> and look at the first replies of any new model: an
+  invented <code>Observation:</code> means a stop sequence is missing (section <a href="#s28-3">28.3</a>).</li>
+<li><strong>Download the Docker images before you need them</strong>, and check the free disk space first
+  (section <a href="#s30">30</a>).</li>
+<li><strong>Do not chase a single failure.</strong> Free models vary from hour to hour; run again before changing
+  code (sections <a href="#s26-5">26.5</a> and <a href="#s27-3">27.3</a>).</li>
+<li><strong>Never add a payment method to a provider account</strong> (section <a href="#s26-4">26.4</a>).</li>
+<li><strong>Write the README's description of how you used AI as you go</strong>, honestly. The subject asks for
+  it, and it is much easier than reconstructing it at the end.</li>
+</ul></section><div class="parte" id="p-part-i"><p class="parte-etiqueta">Part I</p><h2 class="parte-titulo">Background concepts</h2><p>This part explains general ideas that do not depend on Agent Smith. It is worth reading before
+Part II, which assumes them.</p></div><section id="s1"><h2><span class="num">1</span><span class="h2-texto">What a coding AI agent is</span></h2><h3 id="s1-1">1.1 From a question to an agent</h3>
+<p>A <strong>language model</strong> (LLM, <em>Large Language Model</em>) is a program that, given some text, generates
+the most likely continuation. When used as a chat, a person asks, the model answers, and the
+interaction ends there: the model does not check whether its answer works.</p>
+<p>An <strong>agent</strong> adds what that scheme lacks: the ability to <strong>act and observe the result</strong>. The model
+proposes an action, a program executes it, and the result goes back to the model so it can decide
+the next step. This way it can explore, make mistakes, correct itself and check its work before
+declaring it finished.</p>
+<h3 id="s1-2">1.2 The Thought → Code → Observation loop</h3>
+<p>In this project the agent's actions are <strong>Python code snippets</strong>. Each turn of the loop has three
+parts:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Produced by</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Thought</strong></td>
+<td>The model</td>
+<td>A short sentence about what it will do and why</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td>The model</td>
+<td>A Python block that performs that action</td>
+</tr>
+<tr>
+<td><strong>Observation</strong></td>
+<td>The program</td>
+<td>What happened when the code ran: what it printed, or the error</td>
+</tr>
+</tbody>
+</table></div>
+<p>The observation is added to the conversation, and the model writes its next thought based on it.
+Each complete turn is called an <strong>iteration</strong>.</p>
+<p>An example, for an exercise that asks for a function that adds two numbers:</p>
+<ol>
+<li><em>Thought</em>: "I will write the function and check it against the tests."
+   <em>Code</em>: defines the function and calls a tool that runs the tests.
+   <em>Observation</em>: "All tests pass."</li>
+<li><em>Thought</em>: "The tests pass; I will submit the solution."
+   <em>Code</em>: calls the final-answer function with the solution code.</li>
+</ol>
+<h3 id="s1-3">1.3 Why code and not just text</h3>
+<p>Another common way to give tools to a model is to have it reply with a JSON object naming the tool
+and its arguments. Writing Python is more expressive: it can store a result in a variable and use
+it in the next turn, chain several calls in a single iteration, or use conditions and loops.</p>
+<p>The downside is that this code was written by a model and must be run with care. Section <a href="#s6">6</a> covers
+that.</p>
+<h3 id="s1-4">1.4 How it ends</h3>
+<p>The loop ends in one of two ways:</p>
+<ul>
+<li><strong>Final answer.</strong> The model calls a special function that delivers the result. In this project
+  it is called <code>final_answer</code>: it receives the solution as text and signals that the task is
+  finished.</li>
+<li><strong>A limit is reached.</strong> Maximum number of iterations, tokens (section <a href="#s3">3</a>) or time. Without limits,
+  an agent that cannot find the solution could go on indefinitely.</li>
+</ul></section><section id="s2"><h2><span class="num">2</span><span class="h2-texto">What an agent framework is</span></h2><h3 id="s2-1">2.1 Library versus framework</h3>
+<p>A <strong>library</strong> is code your program calls when it needs it: you decide the order and the flow. A
+<strong>framework</strong> reverses that relationship: it defines the program's structure and overall flow, and
+you write the pieces it calls at the right moment.</p>
+<h3 id="s2-2">2.2 Agent frameworks</h3>
+<p>An <strong>agent framework</strong> is a framework that already solves the loop from section <a href="#s1">1</a>: how the model
+is called, how its actions are extracted and executed, how the conversation is stored and how
+tools are registered. Its users only configure the model, write the prompt and declare their
+tools. Well-known examples are LangChain and LangGraph, LlamaIndex, smolagents, CrewAI and
+AutoGen.</p>
+<h3 id="s2-3">2.3 Why it matters in this project</h3>
+<p>The goal of the project is precisely to <strong>build that loop</strong>. That is why the subject forbids any
+library that re-implements agent orchestration: the agent loop must be your own code.</p>
+<p>Libraries that solve other parts are allowed, such as a provider's official API client or the MCP
+SDK (section <a href="#s5">5</a>): they do not decide the agent's flow.</p></section><section id="s3"><h2><span class="num">3</span><span class="h2-texto">Talking to an AI model through an API</span></h2><h3 id="s3-1">3.1 Request and response</h3>
+<p>Provider models (Mistral, Google, Groq, OpenRouter…) do not run on your computer: they are used
+through an <strong>API</strong>, a web address to which the program sends an HTTP request with a JSON body and
+from which it receives a response, also in JSON.</p>
+<p>Many providers imitate the format of OpenAI's API called <strong>chat completions</strong>. That is why they are
+called "OpenAI-compatible": the same program can talk to all of them by changing only three
+things.</p>
+<ul>
+<li><strong>Base URL</strong>: the provider's address, for example <code>https://api.mistral.ai/v1</code>.</li>
+<li><strong>Model name</strong>: which of its models you want to use.</li>
+<li><strong>API key</strong>: a secret string that identifies your account. Anyone who has it can spend your
+  quota, so it is never written in the code: it is stored in a <code>.env</code> file, which is not committed
+  to the repository, and the program reads it from <strong>environment variables</strong>.</li>
+</ul>
+<p>An <strong>SDK</strong> is a library a provider publishes so that you do not have to build HTTP requests by
+hand. OpenAI's official SDK works with any compatible provider.</p>
+<h3 id="s3-2">3.2 Messages and roles</h3>
+<p>The request contains a list of <strong>messages</strong>, each with a role:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system</code></td>
+<td>The <strong>system prompt</strong>: general instructions, response format, available tools</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td>What the model receives: the task and, in an agent, the observations</td>
+</tr>
+<tr>
+<td><code>assistant</code></td>
+<td>What the model answered in previous turns</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The model remembers nothing between requests.</strong> For it to know what happened before, the
+program resends the whole conversation with every request, or the part it decides to keep. This
+has a direct consequence on cost, explained next.</p>
+<h3 id="s3-3">3.3 Tokens</h3>
+<p>Models do not work with letters or words but with <strong>tokens</strong>: text fragments a few characters
+long. As a rough guide, in English one token is about four characters.</p>
+<ul>
+<li><strong>Input tokens</strong>: those of all the messages sent in the request.</li>
+<li><strong>Output tokens</strong>: those the model generates in its response.</li>
+</ul>
+<p>Limits and quotas are measured in tokens. Since the conversation is resent in full, a long
+observation is not paid for once: it is paid for in every later request while it stays in the
+history.</p>
+<p>Some models, called <strong>reasoning models</strong>, also generate internal text before answering. Those
+tokens count as output too.</p>
+<h3 id="s3-4">3.4 Request parameters</h3>
+<ul>
+<li><strong>Maximum output tokens</strong>: cuts the response when that number is reached.</li>
+<li><strong>Temperature</strong>: how much randomness goes into choosing each token. A low value gives more
+  stable answers.</li>
+<li><strong>Stop sequences</strong> (<code>stop</code>): strings that end the response when generated. In an agent they are
+  essential. Without them, the model writes its code and <strong>keeps writing an invented
+  observation</strong> instead of waiting for the real one.</li>
+</ul>
+<h3 id="s3-5">3.5 The response and the <code>usage</code> block</h3>
+<p>A successful response contains, among other fields:</p>
+<ul>
+<li>the generated <strong>text</strong>;</li>
+<li>the <strong>model</strong> that actually answered, which may differ from the one requested (section <a href="#s4-4">4.4</a>);</li>
+<li>the <strong><code>usage</code></strong> block, with the input tokens (<code>prompt_tokens</code>) and output tokens
+  (<code>completion_tokens</code>) the provider has counted.</li>
+</ul>
+<p><code>usage</code> is the only reliable measure of consumption. A program can estimate tokens before
+sending, but an estimate is not a measurement.</p>
+<h3 id="s3-6">3.6 HTTP status codes</h3>
+<p>Every HTTP response carries a number that summarises what happened:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>What is usually done</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>200</strong></td>
+<td>Success: the model generated a response</td>
+<td>Read the text and <code>usage</code></td>
+</tr>
+<tr>
+<td><strong>400</strong></td>
+<td>Malformed request (unsupported parameter, invalid message)</td>
+<td>Fix the request; retrying does not help</td>
+</tr>
+<tr>
+<td><strong>401 / 403</strong></td>
+<td>Invalid key or no permission for that model</td>
+<td>Check the key or the plan</td>
+</tr>
+<tr>
+<td><strong>404</strong></td>
+<td>The model or path does not exist</td>
+<td>Check the model name; it may have been retired</td>
+</tr>
+<tr>
+<td><strong>413</strong></td>
+<td>The request is too large for that model or plan</td>
+<td>Send a smaller request; waiting does not help</td>
+</tr>
+<tr>
+<td><strong>429</strong></td>
+<td>Too many requests or quota exhausted</td>
+<td>Wait or use another key</td>
+</tr>
+<tr>
+<td><strong>500 / 502 / 503 / 504</strong></td>
+<td>Provider error or overload</td>
+<td>Retry after a moment</td>
+</tr>
+</tbody>
+</table></div>
+<p>There are also failures with no code: a <strong>timeout</strong>, when the response does not arrive within the
+maximum time, and a <strong>lost connection</strong>.</p>
+<p>An important distinction for measuring correctly: on a 4xx or 5xx the provider is taken to have
+<strong>rejected the request without generating a response</strong>, so no tokens were consumed. On a timeout
+you cannot know: the model may have generated a response that never arrived.</p>
+<h3 id="s3-7">3.7 Retries and <code>retry-after</code></h3>
+<p><strong>Retrying</strong> means repeating a request that failed for a transient reason. Each retry is one more
+request, and must be counted as such.</p>
+<p>On a 429, many providers send a <strong><code>retry-after</code></strong> header saying how many seconds to wait before
+trying again.</p></section><section id="s4"><h2><span class="num">4</span><span class="h2-texto">Common problems with free APIs</span></h2><p>Free plans let you develop without paying, but they impose restrictions an agent must withstand
+without breaking.</p>
+<h3 id="s4-1">4.1 Usage limits</h3>
+<p>Providers limit usage along several dimensions at once, and any of them triggers a 429:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Limit</th>
+<th>Usual abbreviation</th>
+<th>Typical effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Requests per minute</td>
+<td>RPM</td>
+<td>Many quick turns in a row</td>
+</tr>
+<tr>
+<td>Tokens per minute</td>
+<td>TPM</td>
+<td>Few requests, but very long ones</td>
+</tr>
+<tr>
+<td>Requests per day</td>
+<td>RPD</td>
+<td>Exhausted after a long testing session</td>
+</tr>
+<tr>
+<td>Tokens per day</td>
+<td>TPD</td>
+<td>The same, measured in tokens</td>
+</tr>
+</tbody>
+</table></div>
+<p>Four details worth knowing:</p>
+<ul>
+<li><strong>Per account, per project or per key.</strong> The limit usually belongs to the account (or, with some
+  providers, to the project the key was created in): several keys from the same account share the
+  quota. To spread the load you need keys from different accounts or projects.</li>
+<li><strong>Key rotation.</strong> Switching to another key when one receives a 429. It only helps if the keys
+  have independent quotas.</li>
+<li><strong>Daily quotas do not always reset at midnight.</strong> Some providers replenish them continuously: with
+  1,000 requests per day, one request comes back every 86.4 seconds. Waiting until "tomorrow" then
+  gains nothing.</li>
+<li><strong>A per-request ceiling is a different limit.</strong> Besides tokens per minute, a plan may refuse any
+  single request above a size. That refusal (often a 413) is permanent for that request: only a
+  smaller request gets through.</li>
+</ul>
+<h3 id="s4-2">4.2 Models change</h3>
+<p>On free plans, available models and their conditions change without notice: a model disappears,
+becomes paid or has its limit reduced. An agent that worked may stop working without a single line
+of code changing. That is why it pays to be able to switch models by editing only the
+configuration, and to check it before relying on it.</p>
+<h3 id="s4-3">4.3 Unusual responses</h3>
+<p>Free models produce responses that documentation rarely mentions:</p>
+<ul>
+<li><strong>Empty responses</strong>: status 200, but no text.</li>
+<li><strong>Responses without <code>usage</code></strong>: the model generated something, but its cost is unknown.</li>
+<li><strong>Tool calls in another format</strong>: the model does not write the requested Python block but the
+  call format it was trained on, or uses the API's own function-calling channel.</li>
+<li><strong>Invented observations</strong>: the model writes what it thinks its code will return instead of
+  waiting (section <a href="#s3-4">3.4</a>).</li>
+<li><strong>Excessive reasoning</strong>: a reasoning model may spend much of its output allowance before writing
+  the answer.</li>
+</ul>
+<h3 id="s4-4">4.4 Routers</h3>
+<p>Some services, such as OpenRouter, do not host models: they forward the request to other
+providers. The model that answers may not be exactly the one requested, and the response says so
+in its model field. That is why it is worth recording the model that answered, not just the one
+requested.</p>
+<h3 id="s4-5">4.5 Consequence for the design</h3>
+<p>An honest agent <strong>measures what it consumes and does not invent it</strong>. If it does not know how much
+a request cost, it must say so instead of recording a zero. And each kind of failure needs a
+different response: wait, switch keys, retry or stop.</p></section><section id="s5"><h2><span class="num">5</span><span class="h2-texto">What MCP is</span></h2><h3 id="s5-1">5.1 The problem it solves</h3>
+<p>An agent needs tools: reading files, searching code, running tests. If every agent defines them
+its own way, they cannot be reused. <strong>MCP</strong> (<em>Model Context Protocol</em>) is an open protocol that
+standardises how a program offers capabilities to a language model.</p>
+<h3 id="s5-2">5.2 Server and client</h3>
+<ul>
+<li>An <strong>MCP server</strong> is a program that <strong>offers</strong> capabilities.</li>
+<li>An <strong>MCP client</strong> is the part of the agent's program that <strong>connects</strong> to a server, asks what
+  it offers and asks it to perform operations.</li>
+</ul>
+<p>The server does the work. The client only relays requests and results.</p>
+<h3 id="s5-3">5.3 What a server can offer</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>What it is</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tools</strong></td>
+<td>Functions with a name, description and parameters</td>
+<td><code>run_tests(code, test_list)</code></td>
+</tr>
+<tr>
+<td><strong>Resources</strong></td>
+<td>Data identified by an address (URI)</td>
+<td>A configuration file</td>
+</tr>
+<tr>
+<td><strong>Prompts</strong></td>
+<td>Reusable text templates</td>
+<td>A predefined instruction</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each tool publishes a <strong>schema</strong> in JSON Schema format: which parameters it accepts, their types,
+which are required and their default values.</p>
+<h3 id="s5-4">5.4 Discovery</h3>
+<p>MCP's central feature is that <strong>the client does not need to know the server in advance</strong>. When it
+connects, it asks which tools, resources and prompts exist and receives their schemas. A well-built
+agent works with a server it has never seen.</p>
+<h3 id="s5-5">5.5 Transports</h3>
+<p>MCP defines how messages travel between client and server:</p>
+<ul>
+<li><strong>stdio</strong>: the client starts the server as a child process and they communicate through its
+  standard input and output (section <a href="#s7">7</a>). It is the natural choice for a local server.</li>
+<li><strong>Streamable HTTP</strong>: the server is already running and listens on a URL, local or remote.</li>
+</ul>
+<p>Messages follow the <strong>JSON-RPC</strong> format, which defines standard error codes. Two of them matter
+here: <strong>-32601</strong> (the method or tool does not exist) and <strong>-32602</strong> (invalid parameters). Both mean
+the caller made a mistake, not that the server failed.</p>
+<h3 id="s5-6">5.6 The manual</h3>
+<p>With the discovered schemas, the agent can generate a <strong>manual</strong>: text with each tool's name,
+description and parameters. That manual goes into the system prompt so the model knows what it
+can call and how. If another server is connected, the manual changes by itself.</p></section><section id="s6"><h2><span class="num">6</span><span class="h2-texto">What a sandbox is</span></h2><h3 id="s6-1">6.1 The risk</h3>
+<p>An agent runs code written by a model. That code may be wrong or, in the worst case, harmful:</p>
+<ul>
+<li>deleting or reading files it should not;</li>
+<li>connecting to the internet, for example to look up the solution or leak data;</li>
+<li>never finishing, like a <code>while True</code>;</li>
+<li>consuming all the computer's memory;</li>
+<li>reading the agent's own API keys.</li>
+</ul>
+<p>A <strong>sandbox</strong> is an execution environment that limits what that code can do.</p>
+<h3 id="s6-2">6.2 Kinds of controls</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Control</th>
+<th>What it prevents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Allowed imports</strong></td>
+<td>Loading dangerous modules such as <code>os</code>, <code>subprocess</code> or <code>socket</code></td>
+</tr>
+<tr>
+<td><strong>Restricted builtins</strong></td>
+<td>Using built-in functions such as <code>eval</code>, <code>exec</code> or <code>open</code> without control</td>
+</tr>
+<tr>
+<td><strong>Allowed directories</strong></td>
+<td>Reading or writing outside specific folders</td>
+</tr>
+<tr>
+<td><strong>No network</strong></td>
+<td>Opening connections</td>
+</tr>
+<tr>
+<td><strong>Time limit</strong></td>
+<td>Blocks that never finish</td>
+</tr>
+<tr>
+<td><strong>Memory limit</strong></td>
+<td>Exhausting memory</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Builtins</strong> are the functions Python offers without importing anything (<code>print</code>, <code>len</code>, <code>open</code>,
+<code>eval</code>…). They can be replaced with a reduced list.</p>
+<h3 id="s6-3">6.3 Isolating with a process</h3>
+<p>There is an important difference between running the code in a <strong>thread</strong> or in a separate
+<strong>process</strong> (section <a href="#s7">7</a>):</p>
+<ul>
+<li>A <strong>thread</strong> shares memory with the main program and, in Python, <strong>cannot be stopped from
+  outside</strong>. If the code enters an infinite loop, the thread keeps running.</li>
+<li>A <strong>process</strong> has its own memory, and the operating system can terminate it at any moment. It
+  also cannot see the main program's variables.</li>
+</ul>
+<p>That is why isolating in a separate process makes a real time limit possible.</p>
+<h3 id="s6-4">6.4 Limits of a sandbox written in Python</h3>
+<p>Restricting imports and builtins from within Python is useful, but it is not an absolute barrier:
+a determined attacker can explore the language's internal objects to recover blocked functions.
+Strong barriers come from the operating system or a container. A sandbox built only with the
+standard library is reasonable for code from a model trying to solve a task, as long as its limits
+are understood.</p></section><section id="s7"><h2><span class="num">7</span><span class="h2-texto">Processes and inter-process communication</span></h2><h3 id="s7-1">7.1 Processes</h3>
+<p>A <strong>process</strong> is a running program with its own memory. A process can create others, called
+<strong>child processes</strong>. Each one has its own <strong>environment</strong>: a copy of the environment variables,
+which its parent can prepare before starting it. This is how you decide which secrets each process
+can see.</p>
+<h3 id="s7-2">7.2 Standard input and output</h3>
+<p>Every process has three text channels: <strong>standard input</strong> (<em>stdin</em>), <strong>standard output</strong>
+(<em>stdout</em>) and <strong>standard error</strong> (<em>stderr</em>). A parent process can connect to its child's channels
+to send it data and read what it writes.</p>
+<h3 id="s7-3">7.3 Pipes</h3>
+<p>A <strong>pipe</strong> is a channel through which one process writes and another reads. It has a very useful
+property: <strong>when the writing end is closed, the reader receives "end of file"</strong> (EOF). If a process
+dies, the operating system closes all its pipes, and whoever was reading from them finds out.</p>
+<p>Python's <code>multiprocessing</code> library creates processes, and pipes between them through which Python
+objects such as dictionaries can be sent directly.</p>
+<h3 id="s7-4">7.4 Signals</h3>
+<p><strong>Signals</strong> are notifications the operating system delivers to a process:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>How it is produced</th>
+<th>Can the process react?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SIGINT</strong></td>
+<td>Pressing Ctrl+C</td>
+<td>Yes: it can clean up before exiting, or ignore it</td>
+</tr>
+<tr>
+<td><strong>SIGTERM</strong></td>
+<td>A normal request to terminate (<code>kill</code>)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>SIGKILL</strong></td>
+<td><code>kill -9</code></td>
+<td><strong>No</strong>: the process disappears instantly</td>
+</tr>
+</tbody>
+</table></div>
+<p>With <code>kill -9</code>, no <code>finally</code> block or cleanup function runs. The only guarantee is that the
+operating system closes the process's files and pipes.</p>
+<h3 id="s7-5">7.5 Asynchronous programming</h3>
+<p><strong>Asynchronous programming</strong> (in Python, <code>asyncio</code>) lets a program wait on several input/output
+operations at once without using several threads. It requires special functions (<code>async def</code>)
+called from an <strong>event loop</strong>. Some libraries, such as the official MCP SDK, only offer
+asynchronous functions.</p></section><section id="s8"><h2><span class="num">8</span><span class="h2-texto">Docker essentials</span></h2><h3 id="s8-1">8.1 Image and container</h3>
+<ul>
+<li>An <strong>image</strong> is a file-system template with programs already installed, for example "Python
+  3.10" or "the sympy repository with its dependencies".</li>
+<li>A <strong>container</strong> is an isolated run of an image: it has its own files, processes and network,
+  and does not see the host computer's unless allowed.</li>
+</ul>
+<p>Containers are managed by a separate service, the <strong>Docker daemon</strong>. That is why <strong>they are not
+child processes of the program that created them</strong>: if that program dies, the container stays
+alive.</p>
+<h3 id="s8-2">8.2 Basic commands</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docker pull &lt;image&gt;</code></td>
+<td>Downloads an image</td>
+</tr>
+<tr>
+<td><code>docker run &lt;image&gt; &lt;command&gt;</code></td>
+<td>Creates and starts a container running that command</td>
+</tr>
+<tr>
+<td><code>docker exec &lt;container&gt; &lt;command&gt;</code></td>
+<td>Runs a command inside a running container</td>
+</tr>
+<tr>
+<td><code>docker ps</code></td>
+<td>Lists containers (with <code>-a</code>, stopped ones too)</td>
+</tr>
+<tr>
+<td><code>docker rm -f &lt;container&gt;</code></td>
+<td>Stops and removes a container</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>docker run</code> options used in this project:</p>
+<ul>
+<li><code>--rm</code>: removes the container automatically when its main process ends.</li>
+<li><code>--network none</code>: no network.</li>
+<li><code>--memory</code>: a memory limit. (<code>--cpus</code>, the CPU limit, is not used: some Docker installations
+  reject it, section <a href="#s30-2">30.2</a>.)</li>
+<li><code>--name</code> and <code>--label</code>: a name and a label, to find it later.</li>
+<li><code>-i</code>: keeps the container's standard input connected.</li>
+<li><code>--pull never</code>: fail instead of downloading the image if it is missing.</li>
+</ul>
+<h3 id="s8-3">8.3 Orphaned containers</h3>
+<p>A container lives as long as its <strong>main process</strong> keeps running. If the program that created it
+dies without removing it, it becomes <strong>orphaned</strong>: it keeps using resources and nobody will delete
+it. Avoiding this when the program is killed with <code>kill -9</code> requires the container to depend on
+something the operating system closes by itself (sections <a href="#s7-3">7.3</a> and <a href="#s23">23</a>).</p></section><section id="s9"><h2><span class="num">9</span><span class="h2-texto">What MBPP is</span></h2><p><strong>MBPP</strong> (<em>Mostly Basic Python Problems</em>) is a set of about a thousand entry-level Python
+programming exercises, published by Google Research. Each exercise has:</p>
+<ul>
+<li>a natural-language <strong>description</strong> ("write a function that…");</li>
+<li>the <strong>signature</strong> of the function to write;</li>
+<li>a reference solution;</li>
+<li>some <strong>assertions</strong> (<code>assert</code>) that check the result.</li>
+</ul>
+<p>A solution is correct if the function passes the assertions. It is used to measure whether a model
+can write small, correct functions.</p>
+<p>When evaluating an agent it is common to <strong>hide one of the assertions</strong>: the agent tests its code
+against the visible ones, and the final check uses all of them. This catches solutions that only
+fit the known cases.</p></section><section id="s10"><h2><span class="num">10</span><span class="h2-texto">What SWE-bench is</span></h2><h3 id="s10-1">10.1 The task set</h3>
+<p><strong>SWE-bench</strong> is a set of tasks built from <strong>real GitHub issues</strong> in well-known Python projects such
+as django, sympy, scikit-learn or xarray. Each task corresponds to an issue that was solved with a
+code change. <strong>SWE-bench Verified</strong> is a subset of 500 tasks reviewed by people to make sure the
+issue text is enough to solve them.</p>
+<h3 id="s10-2">10.2 What the agent receives and delivers</h3>
+<ul>
+<li>It <strong>receives</strong> the issue text and the repository in its state before the fix.</li>
+<li>It <strong>delivers</strong> a <strong>patch</strong>: a description of the changes made to the files.</li>
+</ul>
+<p>A patch is produced with <code>git diff</code>, which compares modified files with their committed version and
+shows the added and removed lines. Each modified file starts with a <code>diff --git</code> line.</p>
+<h3 id="s10-3">10.3 How it is judged</h3>
+<p>The patch is applied to a clean copy of the repository and two groups of tests are run:</p>
+<ul>
+<li>those that <strong>failed</strong> before and must now <strong>pass</strong> (they show the issue is fixed);</li>
+<li>those that <strong>already passed</strong> and must <strong>keep passing</strong> (they show nothing else broke).</li>
+</ul>
+<p>The agent does not receive the original fix. It can run the task's <strong>evaluation script</strong> to see how
+the tests are doing.</p>
+<h3 id="s10-4">10.4 Containers and <code>/testbed</code></h3>
+<p>Installing each project with the exact versions of its dependencies would be very costly. That is
+why SWE-bench distributes <strong>one Docker image per task</strong>, with the repository already prepared. In
+those images the repository is always in the <strong><code>/testbed</code></strong> directory, which is also the default
+working directory. It is not a choice made by whoever builds the agent: it is the convention of the
+SWE-bench images, and the agent's tools use that path.</p></section><section id="s11"><h2><span class="num">11</span><span class="h2-texto">How an agent is evaluated</span></h2><h3 id="s11-1">11.1 Metrics</h3>
+<p>Solving the task is not enough to compare agents or models. The following are also measured:</p>
+<ul>
+<li><strong>Success</strong>: whether the solution passes validation.</li>
+<li><strong>Iterations</strong>: how many turns of the loop were needed.</li>
+<li><strong>Requests</strong>: how many API calls, retries included.</li>
+<li><strong>Input and output tokens</strong>: the cost.</li>
+<li><strong>Time</strong>: from start to finish.</li>
+</ul>
+<p>Two agents that solve the same task are not equally good if one needs three times as many tokens.</p>
+<h3 id="s11-2">11.2 Benchmarks and model comparison</h3>
+<p>A <strong>benchmark</strong> is a fixed set of tasks used to compare performance. Comparing models means running
+the same agent, with each model, on the same tasks, and recording the metrics for each combination.
+<strong>Provider reliability</strong> is measured too: response time, retries and availability.</p>
+<h3 id="s11-3">11.3 Intermediate metrics</h3>
+<p>A failed task may have been close to being solved. <strong>Intermediate metrics</strong> measure progress within
+a run, for example: at which iteration the agent first read the file it ended up fixing, or how many
+iterations passed between the tests starting to pass and the submission.</p>
+<h3 id="s11-4">11.4 Ablation</h3>
+<p>An <strong>ablation</strong> is an experiment that changes <strong>a single thing</strong> (a sentence of the prompt, a tool, a
+parameter) and measures the result before and after, with the same model and the same tasks. It is
+how you know whether a change improves the agent or whether the difference is due to the model's
+randomness.</p></section><div class="parte" id="p-part-ii"><p class="parte-etiqueta">Part II</p><h2 class="parte-titulo">Inside Agent Smith</h2><p>This part describes what the project asks for and how Agent Smith solves it, without going into the
+code.</p></div><section id="s12"><h2><span class="num">12</span><span class="h2-texto">What the subject asks for</span></h2><h3 id="s12-1">12.1 The project in one paragraph</h3>
+<p>Agent Smith is an agent that solves programming tasks autonomously with the Thought → Code →
+Observation loop. A language model, accessed through an API, writes Python code. That code runs in
+a custom sandbox that can call tools from an MCP server, and the result goes back to the model.
+The agent is applied to two benchmarks, MBPP and SWE-bench, and must respect strict limits on
+iterations, tokens and time, recording real metrics for every step.</p>
+<h3 id="s12-2">12.2 General requirements</h3>
+<ol>
+<li><strong>Python 3.10</strong> and <strong>uv</strong> as the package manager.</li>
+<li><strong>All errors handled gracefully</strong>: an unexpected crash counts as a failure.</li>
+<li><strong>Your own</strong> Thought → Code → Observation <strong>loop</strong>, <strong>without agent frameworks</strong> (section <a href="#s2">2</a>).</li>
+<li><strong>Code extraction</strong> from the model's responses. It should accept formats other than a Python
+   block and convert them into equivalent Python calls (section <a href="#s21">21</a>).</li>
+<li><strong>A designed system prompt</strong>: tool documentation, examples of the response format and examples
+   of reasoning.</li>
+<li><strong>All execution inside a configurable sandbox</strong> (section <a href="#s12-3">12.3</a>).</li>
+<li><strong>Explicit observations</strong> in these cases: no valid code block was found; a malformed block was
+   interpreted anyway (explaining how); execution hit the time limit and output is partial; output
+   was truncated because of its size; an edit introduced a syntax error. The model must never have
+   to guess what happened.</li>
+<li><strong>Several providers and models</strong>, interchangeable without rewriting the code.</li>
+<li><strong>Free plans only</strong>, with <strong>several keys per provider</strong> and <strong>rotation</strong> when limits are
+   reached. Keys are read from environment variables or a <code>.env</code> file; a key written in the code is
+   a security failure.</li>
+<li><strong>Usage tracking</strong>: tokens, retries, latency and requests.</li>
+<li><strong>Tools independent of the loop</strong>: they must be testable on their own.</li>
+<li><strong>Only your own MCP servers.</strong></li>
+<li><strong>Honesty</strong>: the agent must not look up the solution in pull requests, issues or other external
+    sources, nor bypass the sandbox. This is strictly forbidden.</li>
+<li><strong>A <code>README.md</code></strong> in English with a fixed first line and sections on architecture, the loop,
+    the sandbox, the tools and the results.</li>
+<li><strong>A <code>BENCHMARK_REPORT.md</code> report</strong> (section <a href="#s12-7">12.7</a>).</li>
+</ol>
+<h3 id="s12-3">12.3 Sandbox requirements</h3>
+<p><strong>Configuration.</strong> Sandbox limits are defined in a JSON file and loaded into a <strong><code>SandboxConfig</code></strong>
+class, which the subject provides. It is a <strong>Pydantic</strong> model, a library that validates data and
+converts it to and from JSON. Its fields are:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it controls</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>authorized_imports</code></td>
+<td>Modules that may be imported; <code>math.*</code> also allows its submodules</td>
+<td><code>math</code>, <code>collections</code>, <code>itertools</code>, <code>re</code>, <code>json</code>, <code>typing</code>, <code>functools</code>, <code>random</code>…</td>
+</tr>
+<tr>
+<td><code>allowed_directories</code></td>
+<td>Folders where reading and writing are allowed</td>
+<td><code>/testbed</code> and <code>/tmp/agent</code></td>
+</tr>
+<tr>
+<td><code>max_execution_time_seconds</code></td>
+<td>Maximum time for one code block</td>
+<td>30</td>
+</tr>
+<tr>
+<td><code>max_memory_mb</code></td>
+<td>Maximum memory</td>
+<td>512</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What it must block:</strong> imports outside the list, file access outside the allowed directories, the
+network, blocks that exceed the time limit, excess memory and dangerous builtins. All of this
+<strong>with the standard library only</strong>: external packages such as RestrictedPython are forbidden.</p>
+<p><strong><code>final_answer</code>.</strong> A function the sandbox itself makes available to the code. When the code calls
+it with a string, the sandbox captures that string and tells the loop the task is finished. <strong>It is
+not an MCP tool</strong>: it is always present, whatever server is connected. For MBPP it receives the
+solution code; for SWE-bench, the patch returned by <code>get_patch()</code>.</p>
+<p><strong>Two kinds of functions.</strong> Inside the sandbox the code sees the functions that wrap the tools
+discovered on the MCP server, which change with the server, and <code>final_answer</code>, which does not.</p>
+<p><strong>MCP integration.</strong> stdio and streamable HTTP transports; tools, resources and prompts exposed;
+tools callable as Python functions; working with an unknown server; and a <strong>generated manual</strong>
+built from the schemas and included in the prompt.</p>
+<p><strong>A command-line command</strong>, <code>uv run sandbox</code>, with an interactive mode (section <a href="#s14">14</a>).</p>
+<p><strong>Exception propagation.</strong> <code>KeyboardInterrupt</code> and <code>SystemExit</code> must not be silently swallowed.</p>
+<h3 id="s12-4">12.4 MBPP requirements</h3>
+<ul>
+<li><strong>Input</strong>: a JSON file with the identifier, the description, the function signature, the imports
+  the tests need and the list of public assertions (model <code>MBPPTaskInput</code>).</li>
+<li><strong>Required tool</strong>: <code>run_tests</code>, on your own MCP server.</li>
+<li><strong>Output</strong>: the result JSON (section <a href="#s12-6">12.6</a>), with the function code as the solution.</li>
+<li><strong>Command</strong>: <code>uv run python -m agent_mbpp --task-file … --output … --model-name … --provider-url …</code></li>
+<li><strong>Per-task limits</strong>: 10 iterations, 6,000 input tokens, 1,500 output tokens and 120 seconds.</li>
+<li><strong>A configurable maximum number of iterations.</strong></li>
+</ul>
+<h3 id="s12-5">12.5 SWE-bench requirements</h3>
+<ul>
+<li><strong>Input</strong>: a JSON file with the identifier, the issue text, the Docker image, the evaluation
+  script, optional hints and the repository name (model <code>SWEBenchTaskInput</code>).</li>
+<li><strong>Container</strong>: the agent starts the task image and is <strong>responsible for removing the container</strong>
+  when it finishes.</li>
+<li><strong>Where the sandbox goes</strong>: inside the container, or on the host with MCP tools that reach into
+  the container. Both options are valid.</li>
+<li><strong>Nine required tools</strong>, with these signatures:</li>
+</ul>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Tool</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Files</td>
+<td><code>read_file(filepath, start_line, end_line)</code></td>
+<td>Reads a range of numbered lines</td>
+</tr>
+<tr>
+<td>Files</td>
+<td><code>edit_file(filepath, old_str, new_str)</code></td>
+<td>Replaces an exact string with another</td>
+</tr>
+<tr>
+<td>Files</td>
+<td><code>list_files(directory, pattern)</code></td>
+<td>Lists files matching a pattern</td>
+</tr>
+<tr>
+<td>Search</td>
+<td><code>search_code(pattern, file_pattern)</code></td>
+<td>Searches like <code>grep</code>: <code>path:line content</code></td>
+</tr>
+<tr>
+<td>Search</td>
+<td><code>search_function_or_class_definition_in_code(name)</code></td>
+<td>Finds the definition of a function or class</td>
+</tr>
+<tr>
+<td>Search</td>
+<td><code>find_references(name, filepath, line)</code></td>
+<td>Finds the uses of a name</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td><code>run_tests()</code></td>
+<td>Runs the evaluation script</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td><code>get_patch()</code></td>
+<td>Returns the <code>git diff</code> of the changes</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td><code>run_command(command, workdir)</code></td>
+<td>Runs a command and returns output, errors and exit code</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Output</strong>: the result JSON, with the patch as the solution, generated with
+  <code>git -c core.fileMode=false diff</code>.</li>
+<li><strong>Command</strong>: <code>uv run python -m agent_swebench</code> with the same arguments as MBPP.</li>
+<li><strong>Per-task limits</strong>: 30 iterations, 300,000 input tokens, 10,000 output tokens and 900 seconds.</li>
+</ul>
+<p>Token limits are <strong>cumulative</strong> over the whole task, and reasoning tokens count like any others.</p>
+<h3 id="s12-6">12.6 The result JSON</h3>
+<p>Each run of the agent writes a <code>solution.json</code> file with the <strong><code>SolutionOutput</code></strong> structure. Its
+<strong><code>steps</code></strong> field is a list with one <strong><code>StepMetrics</code></strong> element per iteration.</p>
+<p><strong><code>StepMetrics</code>: what is recorded for each iteration</strong></p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>step</code></td>
+<td>Iteration number, starting at 1</td>
+</tr>
+<tr>
+<td><code>input_tokens</code>, <code>output_tokens</code></td>
+<td>Measured tokens for that iteration</td>
+</tr>
+<tr>
+<td><code>request_time_ms</code></td>
+<td>Time of the API call, in milliseconds</td>
+</tr>
+<tr>
+<td><code>api_url</code>, <code>model_name</code></td>
+<td>Provider and model used in that step</td>
+</tr>
+<tr>
+<td><code>llm_output</code></td>
+<td>The model's response, unmodified</td>
+</tr>
+<tr>
+<td><code>sandbox_input</code></td>
+<td>The code sent to the sandbox</td>
+</tr>
+<tr>
+<td><code>sandbox_output</code></td>
+<td>What the execution returned: the observation</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td>Retries needed in that iteration (0 if the first request worked)</td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>When it was recorded, in ISO 8601 format</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>SolutionOutput</code>: the task result</strong></p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>task_id</code>, <code>benchmark</code></td>
+<td>Which task, from which benchmark (<code>mbpp</code> or <code>swebench</code>)</td>
+</tr>
+<tr>
+<td><code>success</code></td>
+<td>Whether the agent <strong>believes</strong> it solved the task; validation decides for real</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>The function code (MBPP) or the patch (SWE-bench)</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td>The full system prompt that was sent</td>
+</tr>
+<tr>
+<td><code>iterations</code></td>
+<td>How many iterations were used: the number of elements in <code>steps</code></td>
+</tr>
+<tr>
+<td><code>total_requests</code></td>
+<td>How many API requests were made, <strong>retries included</strong></td>
+</tr>
+<tr>
+<td><code>total_input_tokens</code>, <code>total_output_tokens</code></td>
+<td>The sum of the tokens over all steps</td>
+</tr>
+<tr>
+<td><code>total_time_seconds</code></td>
+<td>Wall-clock time from the agent's start to the end</td>
+</tr>
+<tr>
+<td><code>steps</code></td>
+<td>The list of <code>StepMetrics</code></td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>The reason for failure, or empty if there was none</td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>When it was written</td>
+</tr>
+</tbody>
+</table></div>
+<p>So <code>iterations</code> and <code>total_requests</code> do not have to match: an iteration with two retries adds 1 to
+<code>iterations</code> and 3 to <code>total_requests</code>.</p>
+<p>These fields exist so that <strong>the agent's reasoning can be traced</strong> and the figures shown to come
+from a real run. Totals are the sum of the steps, and every token count comes from what the
+provider reported, never from an estimate or an invented value.</p>
+<h3 id="s12-7">12.7 The benchmark report</h3>
+<p><code>BENCHMARK_REPORT.md</code>, at the root of the repository, compares <strong>at least 5 models on the same 3 or
+more SWE-bench tasks</strong>, and includes:</p>
+<ol>
+<li><strong>Setup</strong>: models, providers, tasks and why they were chosen.</li>
+<li><strong>Results table</strong> per model and task: pass or fail, iterations, input and output tokens, and
+   time.</li>
+<li><strong>Provider reliability</strong>: average response time, retries and availability.</li>
+<li><strong>At least two intermediate metrics</strong> (section <a href="#s11-3">11.3</a>).</li>
+<li><strong>At least one ablation</strong> (section <a href="#s11-4">11.4</a>).</li>
+<li><strong>Data-based conclusions</strong>: which models are chosen and which are discarded.</li>
+</ol>
+<p>The <code>solution.json</code> files backing the report must be in the repository.</p></section><section id="s13"><h2><span class="num">13</span><span class="h2-texto">The working environment</span></h2><div class="tabla"><table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>The project repository</strong></td>
+<td>Your code: the agent, the sandbox, the MCP servers and the configuration</td>
+</tr>
+<tr>
+<td><strong>The moulinette</strong></td>
+<td>A program provided with the subject that produces tasks and validates solutions. <strong>It never runs your code</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The moulinette has three commands:</p>
+<ul>
+<li><strong><code>dump</code></strong>: writes a task to a JSON file. For MBPP it <strong>hides the first assertion</strong>: the agent
+  only sees the others.</li>
+<li><strong><code>validate</code></strong>: takes the task and the <code>solution.json</code> and checks two things. <strong>Correctness</strong> (for
+  MBPP it runs every assertion, including the hidden one; for SWE-bench it applies the patch and
+  runs the tests) and <strong>metrics</strong> (iterations, input tokens, output tokens and time within the
+  limits). Only the final <code>PASSED</code> result means the task is solved.</li>
+<li><strong><code>display</code></strong>: shows a <code>solution.json</code> in a readable way, which is handy for inspecting the steps.</li>
+</ul></section><section id="s14"><h2><span class="num">14</span><span class="h2-texto">The three commands</span></h2><p>Agent Smith has three commands. The two agent commands use an AI model; the sandbox one does not.</p>
+<h3 id="s14-1">14.1 Summary</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it is for</th>
+<th>Needs</th>
+<th>Produces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uv run sandbox</code></td>
+<td>Running Python in the sandbox, with or without an MCP server</td>
+<td>Nothing mandatory</td>
+<td>Whatever the code prints</td>
+</tr>
+<tr>
+<td><code>uv run python -m agent_mbpp</code></td>
+<td>Solving an MBPP task with a model</td>
+<td>Task, model, URL, keys, Docker</td>
+<td><code>solution.json</code> with the code</td>
+</tr>
+<tr>
+<td><code>uv run python -m agent_swebench</code></td>
+<td>Solving a SWE-bench task with a model</td>
+<td>Task, model, URL, keys, Docker</td>
+<td><code>solution.json</code> with the patch</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s14-2">14.2 <code>uv run sandbox</code></h3>
+<p>This is the sandbox without the agent: it works for any Python code that respects its restrictions.
+The subject requires it so the sandbox and the tools can be tested independently.</p>
+<pre><code class="language-bash">uv run sandbox                                             # interactive, default configuration
+uv run sandbox config.json                                 # with a custom configuration
+uv run sandbox --mcp-stdio &quot;python mcp_tools_mbpp.py&quot;      # with the MBPP tools
+uv run sandbox --mcp-stdio &quot;python mcp_tools_swebench.py&quot;  # with the SWE-bench tools
+uv run sandbox --mcp-server http://127.0.0.1:8000/mcp      # with an already running server
+</code></pre>
+<ul>
+<li><strong>Configuration</strong>: optional. Without a file, the <code>SandboxConfig</code> defaults are used.</li>
+<li><strong>MCP server</strong>: optional, and only one: <code>--mcp-stdio</code> with the command that starts it, or
+  <code>--mcp-server</code> with its URL. If one is connected, the manual is printed.</li>
+<li><strong>Two input modes</strong>, depending on where the input comes from:</li>
+<li><strong>Interactive</strong>, when typing in a terminal: it shows <code>&gt;&gt;&gt;</code>, runs each entry and asks for
+    another. A multi-line block is closed with an empty line, as in the Python interpreter. It ends
+    with <code>exit</code> or Ctrl+D.</li>
+<li><strong>Script</strong>, when the input comes through a pipe (<code>cat test.py | uv run sandbox</code>): it reads the
+    whole text and runs its statements one by one.</li>
+<li><strong>Persistent variables</strong>: whatever one entry defines is still available in the next ones.</li>
+<li>If a block runs out of time, the process that runs the code is replaced by a new one, with a
+  warning that <strong>the variables have been lost</strong>.</li>
+</ul>
+<p><strong>Processes:</strong></p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Process</th>
+<th>When it exists</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The <code>sandbox</code> command</td>
+<td>Always</td>
+<td>Reads input, prints results, is the MCP client</td>
+</tr>
+<tr>
+<td>Worker</td>
+<td>Always</td>
+<td>Runs the code under the restrictions</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td>Only with <code>--mcp-stdio</code></td>
+<td>Started by the command as a child process</td>
+</tr>
+<tr>
+<td>Docker containers</td>
+<td>If the tools use them</td>
+<td>Created by the MCP server</td>
+</tr>
+</tbody>
+</table></div>
+<p>With <code>--mcp-server</code>, the server is already running elsewhere and the command only connects to it.</p>
+<h3 id="s14-3">14.3 <code>uv run python -m agent_mbpp</code></h3>
+<pre><code class="language-bash">uv run python -m agent_mbpp --task-file task.json --output solution.json \
+  --model-name &lt;model&gt; --provider-url &lt;url&gt;
+</code></pre>
+<p>Optional argument: <code>--max-iterations</code>, 10 by default and never above that limit.</p>
+<p><strong>Processes:</strong> the <strong>agent</strong>, which holds the keys and runs everything; the <strong>worker</strong>, which runs
+the model's code; the <strong>MBPP MCP server</strong>, started by the agent over stdio; and a short-lived
+<strong>Docker container</strong> every time the model calls <code>run_tests</code>.</p>
+<h3 id="s14-4">14.4 <code>uv run python -m agent_swebench</code></h3>
+<pre><code class="language-bash">uv run python -m agent_swebench --task-file task.json --output solution.json \
+  --model-name &lt;model&gt; --provider-url &lt;url&gt;
+</code></pre>
+<p>Optional argument: <code>--max-iterations</code>, 30 by default and with that maximum.</p>
+<p><strong>Processes:</strong> the <strong>agent</strong>; the <strong>task container</strong>, a single one for the whole task, held by the
+<code>docker run</code> command the agent launches (section <a href="#s23-3">23.3</a>); the <strong>SWE-bench MCP server</strong>, which works
+inside that container; and the <strong>worker</strong>.</p>
+<h3 id="s14-5">14.5 Why the agent only works for those two benchmarks</h3>
+<p>The loop is shared, but each benchmark needs its own pieces, which we call an <strong>adapter</strong>: its
+system prompt, how it presents the task, its limits, its MCP server and how it prepares its
+environment (setting up the tests for MBPP, starting the container for SWE-bench). Another kind of
+task would need a new adapter; the loop, the sandbox and the provider client would be reused as
+they are.</p></section><section id="s15"><h2><span class="num">15</span><span class="h2-texto">Architecture: three processes</span></h2><h3 id="s15-1">15.1 Overview</h3>
+<p>A task of the agent runs in three Python processes, plus the Docker containers:</p>
+<pre><code>AGENT (main process)
+├── holds: API keys, limits, task clock, provider client, MCP client
+│
+├── WORKER (child process)                   ← runs the model's code
+│     no keys, no Docker, no network, limited imports, files and memory
+│
+└── MCP SERVER (child process, over stdio)   ← runs the tools
+      └── Docker: tests, reading and editing the repository
+</code></pre>
+<h3 id="s15-2">15.2 The agent</h3>
+<p>The process started by the command. It loads the task, creates the provider client, starts the MCP
+server and the worker, runs the loop and, at the end, closes everything in order and writes the
+result. Of the three, it is <strong>the only process that knows the API keys</strong>.</p>
+<p>Its code is <strong>synchronous</strong>: it does not use <code>asyncio</code>. The only exception is inside the MCP client,
+because the official MCP SDK only offers asynchronous functions. The client starts a <strong>thread</strong> with
+its own event loop and sends every operation there; for the rest of the agent, calling MCP is an
+ordinary function that waits for the answer.</p>
+<h3 id="s15-3">15.3 The worker</h3>
+<p>The process where <strong>the code written by the model runs</strong>. The agent starts it at the beginning of
+the task and it lives until the end. That way it runs every block in the <strong>same namespace</strong>, and
+variables persist between iterations.</p>
+<p>When it starts, before accepting any code:</p>
+<ol>
+<li>It <strong>clears its environment variables</strong> (it only keeps the logging ones). The model's code cannot
+   read the keys.</li>
+<li>It <strong>ignores Ctrl+C</strong>: the agent handles that signal and then closes it.</li>
+<li>It moves into its own <strong>temporary directory</strong>.</li>
+<li>It applies the <strong>memory limit</strong> and <strong>disables the network</strong>.</li>
+<li>It prepares the namespace: restricted builtins, <code>final_answer</code> and one function per discovered
+   MCP tool.</li>
+<li>It tells the agent it is <strong>ready</strong>.</li>
+</ol>
+<p>It is started in <strong>spawn</strong> mode: a fresh Python interpreter that does not inherit the agent's memory
+(neither the provider client nor the MCP thread).</p>
+<p><strong>Why it is a separate process.</strong> If a block never finishes, the agent <strong>kills the process</strong>. With a
+thread that would not be possible (section <a href="#s6-3">6.3</a>). A separate process also shares no memory with the
+agent and cannot read its variables.</p>
+<h3 id="s15-4">15.4 The MCP server</h3>
+<p>The process that <strong>does the trusted work</strong>: running tests in Docker, reading and editing the
+repository. The agent starts it over stdio with a <strong>minimal, explicit environment</strong>: the program
+path, the Docker variables, the task deadline and the data it needs (the session label for MBPP; the
+container and the evaluation script for SWE-bench). It does not inherit the keys.</p>
+<p><strong>Why it is a separate process.</strong> The subject requires it, and it also separates responsibilities:
+the model's code, with no permissions, asks for operations; the server, with Docker access, only
+runs the tools it advertises.</p>
+<h3 id="s15-5">15.5 What each process can see</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th></th>
+<th>API keys</th>
+<th>Docker</th>
+<th>Network</th>
+<th>MCP session</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent</td>
+<td>Yes</td>
+<td>Yes (SWE-bench)</td>
+<td>Yes (model API)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Worker</td>
+<td><strong>No</strong></td>
+<td><strong>No</strong></td>
+<td><strong>No</strong></td>
+<td><strong>No</strong>: it only asks for operations</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td><strong>No</strong></td>
+<td>Yes</td>
+<td>Containers have no network</td>
+<td>It is the other end</td>
+</tr>
+</tbody>
+</table></div></section><section id="s16"><h2><span class="num">16</span><span class="h2-texto">How the processes communicate</span></h2><h3 id="s16-1">16.1 Three channels</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Between</th>
+<th>Channel</th>
+<th>Format</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent ↔ worker</td>
+<td><code>multiprocessing</code> pipe</td>
+<td>Python dictionaries</td>
+</tr>
+<tr>
+<td>Agent ↔ MCP server</td>
+<td>The server's standard input and output (stdio) or HTTP</td>
+<td>MCP protocol (JSON-RPC)</td>
+</tr>
+<tr>
+<td>MCP server ↔ Docker</td>
+<td><code>docker</code> commands run as processes</td>
+<td>The text output of each command</td>
+</tr>
+</tbody>
+</table></div>
+<p>Since the MCP server's standard output carries the protocol, <strong>log messages always go to standard
+error</strong>. A stray <code>print</code> in the server would break the communication.</p>
+<h3 id="s16-2">16.2 Messages between agent and worker</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Direction</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ready</code></td>
+<td>worker → agent</td>
+<td>Set up and waiting for code</td>
+</tr>
+<tr>
+<td><code>execute</code></td>
+<td>agent → worker</td>
+<td>Run this block</td>
+</tr>
+<tr>
+<td><code>output</code></td>
+<td>worker → agent</td>
+<td>Text printed by the code, sent as soon as it is printed</td>
+</tr>
+<tr>
+<td><code>mcp_request</code></td>
+<td>worker → agent</td>
+<td>The code called a tool</td>
+</tr>
+<tr>
+<td><code>mcp_result</code></td>
+<td>agent → worker</td>
+<td>Result (or error) of that tool</td>
+</tr>
+<tr>
+<td><code>done</code></td>
+<td>worker → agent</td>
+<td>Block finished, with its final answer or its error</td>
+</tr>
+</tbody>
+</table></div>
+<p>The conversation is <strong>strictly sequential</strong>: there is only one operation in progress at a time.
+There is no need to number messages or handle concurrency.</p>
+<p>The agent waits for each message <strong>with a time limit</strong>. If it does not arrive in time, the block has
+exceeded its limit: the agent kills the worker. If the worker dies by itself, for example because it
+ran out of memory, the agent receives "end of file" through the pipe and knows immediately.</p>
+<p>Sending output <strong>as soon as it is printed</strong> has a reason: if the block is interrupted by the time
+limit, the agent already has what was printed and can give the model partial output.</p>
+<h3 id="s16-3">16.3 The journey of a tool call</h3>
+<p>When the model's code runs <code>print(run_tests(code=solution, test_list=test_list))</code>:</p>
+<pre><code> WORKER                   AGENT                      MCP SERVER            DOCKER
+     │                       │                            │                  │
+ run_tests(...)              │                            │                  │
+     │── mcp_request ───────▶│                            │                  │
+     │                       │ pauses the block clock     │                  │
+     │    (waiting)          │── MCP call (stdio) ───────▶│                  │
+     │                       │                            │── docker run ───▶│
+     │                       │                            │◀── result ───────│
+     │                       │◀── MCP result ─────────────│                  │
+     │◀── mcp_result ────────│ resumes the clock          │                  │
+ print(result)               │                            │                  │
+     │── output ────────────▶│                            │                  │
+     │── done ──────────────▶│                            │                  │
+</code></pre>
+<p>Three ideas from this diagram:</p>
+<ol>
+<li><strong>The <code>run_tests</code> function the model sees is a wrapper.</strong> It runs nothing: it packs the arguments,
+   asks the agent for the operation and waits. The worker never talks to the MCP server.</li>
+<li><strong>The agent is the intermediary.</strong> This way the model's code cannot use the MCP session for
+   anything other than calling an advertised tool.</li>
+<li><strong>Waiting time is not charged to the block</strong>, but it is charged to the task (section <a href="#s22-3">22.3</a>).</li>
+</ol>
+<h3 id="s16-4">16.4 Errors in a tool call</h3>
+<p>Not all errors are alike:</p>
+<ul>
+<li><strong>The model called it wrongly</strong> (non-existent tool, code -32601; invalid parameters, code -32602)
+  or <strong>the tool reported an error of its own</strong>: the error is returned to the code as an ordinary
+  exception. If the code does not catch it, it appears in the observation and the model can
+  correct itself.</li>
+<li><strong>The connection to the server broke</strong> or timed out: the task cannot continue and ends with a
+  recorded error.</li>
+</ul></section><section id="s17"><h2><span class="num">17</span><span class="h2-texto">An MBPP task step by step</span></h2><ol>
+<li><strong>The clock starts first.</strong> The command records the start time before even reading the task:
+   the 120-second limit includes setup.</li>
+<li><strong>The task is read and validated</strong> with its Pydantic model.</li>
+<li><strong>The deadline is computed with a cleanup reserve</strong>: 120 seconds minus 5, kept to close the
+   worker, the server and the containers without exceeding the limit.</li>
+<li><strong>The provider client is created</strong>: it looks up the models configuration entry matching the
+   requested model and URL, and reads its keys from the environment (section <a href="#s24">24</a>).</li>
+<li><strong>The MBPP MCP server is started</strong> with its minimal environment, which includes a random
+   <strong>session label</strong> used to tag its containers.</li>
+<li><strong>Its capabilities are discovered</strong> and the manual is generated. If the server does not advertise
+   <code>run_tests</code>, the task stops here with an error.</li>
+<li><strong>The system prompt is built</strong>: instructions, an example of the Thought → Code → <code>&lt;end_code&gt;</code>
+   format, how to use <code>run_tests</code> and <code>final_answer</code>, and the manual.</li>
+<li><strong>The worker is started</strong> with the sandbox configuration and the list of tools.</li>
+<li><strong>The data is prepared</strong>: a first block defines <code>test_imports</code> and <code>test_list</code> in the worker, so
+   the model can use them without copying them.</li>
+<li><strong>The loop runs</strong> (section <a href="#s19">19</a>). The model writes the function, tests it with <code>run_tests</code> and,
+    once it passes, calls <code>final_answer</code> with the code.</li>
+<li><strong>Everything is closed</strong>, whatever happens: worker, MCP server and, finally, any container still
+    carrying the session label.</li>
+<li><strong><code>solution.json</code> is written</strong>, also when the task failed, with the metrics that were actually
+    measured. If cleanup fails or the total time exceeds the limit, the result is marked as failed.</li>
+</ol>
+<p>The command's exit code is 0 when the result has been written. <strong>It does not mean the task is
+solved</strong>: <code>success</code> says that and, ultimately, the moulinette.</p></section><section id="s18"><h2><span class="num">18</span><span class="h2-texto">What changes for SWE-bench</span></h2><p>The skeleton is the same. This changes:</p>
+<ul>
+<li><strong>Limits</strong>: 30 iterations, 300,000 and 10,000 tokens, 900 seconds, with a <strong>20-second</strong> cleanup
+  reserve, because removing a large container takes longer.</li>
+<li><strong>Before the MCP server, the task container is started</strong>: if the image is missing it is
+  downloaded; then the container is launched without a network and checked for <code>/testbed</code>
+  (section <a href="#s23-2">23.2</a>).</li>
+<li><strong>The MCP server receives the container identifier</strong> and the evaluation script. All its tools
+  work inside that container.</li>
+<li><strong>The server must advertise all nine tools</strong> before starting.</li>
+<li><strong>The prompt describes a method</strong>: locate the code, read it before changing it, make the minimal
+  change, run the tests, and submit <code>final_answer(get_patch())</code> only when <code>get_patch</code> shows changes.
+  It also reminds the model that sandbox code cannot import the project (<code>run_command</code> exists for
+  running it) and that it must not look for the official fix.</li>
+<li><strong>The task message</strong> presents the identifier, the repository, the issue text and the hints, if
+  any.</li>
+<li><strong>Final check</strong>: even if the model calls <code>final_answer</code>, the task only counts as successful if the
+  answer contains <code>diff --git</code>. A model may submit the "No changes yet." notice that <code>get_patch</code>
+  returns when there are no changes, and that is not a patch.</li>
+</ul></section><section id="s19"><h2><span class="num">19</span><span class="h2-texto">The loop in detail</span></h2><p>The loop is <strong>the same for MBPP and SWE-bench</strong>. The adapter gives it the system prompt, the task
+text, the limits, the provider client and the already started sandbox.</p>
+<h3 id="s19-1">19.1 One iteration, step by step</h3>
+<ol>
+<li><strong>Checks before spending.</strong> If the deadline has been reached or the tokens are exhausted, the loop
+   ends without making any request.</li>
+<li><strong>Select the history</strong> to send (section <a href="#s19-4">19.4</a>).</li>
+<li><strong>Ask the provider for a response.</strong> The client may make several attempts (section <a href="#s24">24</a>) and returns
+   the text, the measured tokens, the number of requests and a possible error.</li>
+<li><strong>Add up the counters.</strong> If no request was made at all, the task ends.</li>
+<li><strong>Record the step immediately</strong>, before knowing whether it went well. That way a failed iteration
+   appears in the result with its real consumption.</li>
+<li><strong>Assess the error, if any</strong> (section <a href="#s19-3">19.3</a>).</li>
+<li><strong>Extract the code</strong> from the response (section <a href="#s21">21</a>).</li>
+<li><strong>Run it</strong> in the sandbox, if there is code. If not, the observation explains why nothing was run
+   and asks for a complete block.</li>
+<li><strong>Build the observation</strong>: extraction notice, printed output, error, timeout notice and final
+   answer, whichever apply. If the block printed nothing, the observation says so explicitly,
+   because an empty observation confuses the model.</li>
+<li><strong>Append to the history</strong> the model's response and the observation.</li>
+<li><strong>Decide whether to stop</strong>: on a final answer, a worker failure or the deadline.</li>
+</ol>
+<h3 id="s19-2">19.2 How it ends</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Exit</th>
+<th>When</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Valid final answer</strong></td>
+<td>The block called <code>final_answer</code> with non-empty text, with no error and no timeout</td>
+<td><code>success</code> true</td>
+</tr>
+<tr>
+<td><strong>Invalid final answer</strong></td>
+<td>Empty, or the block ended with an error or a timeout</td>
+<td><code>success</code> false, with the reason</td>
+</tr>
+<tr>
+<td><strong>Limit</strong></td>
+<td>Deadline, tokens or iterations exhausted</td>
+<td><code>success</code> false: "Iteration limit reached without final_answer", etc.</td>
+</tr>
+<tr>
+<td><strong>Provider failure</strong></td>
+<td>Non-recoverable error (section <a href="#s19-3">19.3</a>)</td>
+<td><code>success</code> false</td>
+</tr>
+<tr>
+<td><strong>Worker failure</strong></td>
+<td>Block time exhausted or process died</td>
+<td><code>success</code> false: its state is lost</td>
+</tr>
+<tr>
+<td><strong>Unexpected error</strong></td>
+<td>Any exception from the loop itself</td>
+<td>Recorded; earlier steps are kept</td>
+</tr>
+</tbody>
+</table></div>
+<p>In every case a complete result is returned. The loop never lets exceptions escape.</p>
+<h3 id="s19-3">19.3 Recoverable and fatal errors</h3>
+<p>When the provider returns an error, the loop distinguishes two cases:</p>
+<ul>
+<li><strong>Recoverable</strong>: the model <strong>did</strong> respond (status 200) and its usage is measured, but the response
+  contains no usable text. It is returned to the model as an observation and the loop continues.
+  Losing the whole task over an occasional empty response would be disproportionate.</li>
+<li><strong>Fatal</strong>: the provider rejected the request and the attempts ran out, usage is unknown, a limit
+  was exceeded or the deadline passed. The step is recorded with the error and the task ends.</li>
+</ul>
+<h3 id="s19-4">19.4 What the model remembers</h3>
+<p>The full history is <strong>not</strong> always sent. Each request carries:</p>
+<ul>
+<li>the system prompt and the task text, always;</li>
+<li>the <strong>most recent messages</strong> that fit in a <strong>budget</strong>, and never fewer than six.</li>
+</ul>
+<p>The budget is recomputed at every iteration: <strong>the remaining input tokens divided by the remaining
+iterations</strong>. If the first turns spend little, later ones get more room; if a huge observation uses
+a lot, the window shrinks by itself.</p>
+<p>A model's configuration can also set a <strong>maximum input per request</strong>. When it does, the budget never
+exceeds it. Only one model uses it: its free plan refuses any request above 7,000 input tokens, so
+its requests are kept to about 6,000 (section <a href="#s26-3">26.3</a>).</p>
+<p>There are two reasons not to use a simpler alternative:</p>
+<ul>
+<li><strong>Sending everything</strong> makes the cost grow very quickly, because every observation is resent in
+  every later request (section <a href="#s3-3">3.3</a>). In SWE-bench it came close to using the whole input budget of a
+  task.</li>
+<li><strong>A small fixed window</strong> makes the model forget what it already did: in one test it kept rereading
+  the same lines of a file it had already edited.</li>
+</ul>
+<p>This trimming only affects what is sent. <strong>The <code>solution.json</code> keeps every step in full.</strong></p></section><section id="s20"><h2><span class="num">20</span><span class="h2-texto">Design decisions</span></h2><p>The subject states what must exist but leaves most of the how open. These are the main decisions.</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Rejected alternative</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Own loop</strong>, shared by both benchmarks, with one adapter per benchmark</td>
+<td>An agent framework; one loop per benchmark</td>
+<td>Required by the subject; a single loop is explained and changed in one place</td>
+</tr>
+<tr>
+<td><strong>Worker in a separate</strong>, persistent <strong>process</strong></td>
+<td>Running in a thread of the agent</td>
+<td>A thread cannot be killed if it never finishes; a process can, and it does not see the keys</td>
+</tr>
+<tr>
+<td><strong>Synchronous agent</strong>; the asynchronous part stays inside the MCP client</td>
+<td>The whole agent asynchronous</td>
+<td>Only the MCP SDK requires it; the rest reads as ordinary code</td>
+</tr>
+<tr>
+<td><strong><code>multiprocessing</code> pipe with dictionaries</strong></td>
+<td>A custom JSON message protocol</td>
+<td>Less code: the library serialises and detects closure</td>
+</tr>
+<tr>
+<td><strong>Sandbox on the host</strong>, tools that reach into the container</td>
+<td>Sandbox inside the container</td>
+<td>The subject allows both; this way the worker never has Docker access</td>
+</tr>
+<tr>
+<td><strong>OpenAI's official SDK</strong> for every provider, with its retries disabled</td>
+<td>Hand-written HTTP requests</td>
+<td>Less code to explain; disabling its retries lets every request be counted</td>
+</tr>
+<tr>
+<td><strong>Explicit selection</strong> of the model by URL and name</td>
+<td>Switching providers automatically after a failure</td>
+<td>Each result belongs to a known model and is reproducible</td>
+</tr>
+<tr>
+<td><strong>Known versus unknown usage</strong> (section <a href="#s24-4">24.4</a>)</td>
+<td>Recording zero when <code>usage</code> is missing</td>
+<td>The subject forbids inventing metrics</td>
+</tr>
+<tr>
+<td><strong>The <code>docker</code> command for both benchmarks</strong></td>
+<td>Docker's Python library</td>
+<td>A single mechanism and one dependency fewer</td>
+</tr>
+<tr>
+<td><strong>SWE-bench container held by the agent's standard input</strong></td>
+<td>Keeping it alive with a command that never ends</td>
+<td>It is the only way for it to disappear even if the agent is killed with <code>kill -9</code> (section <a href="#s23-3">23.3</a>)</td>
+</tr>
+<tr>
+<td><strong>Tolerant extraction</strong>: translating the call formats models use</td>
+<td>Forbidding them in the prompt</td>
+<td>Hardening the prompt does not remove them; translating them recovers lost iterations</td>
+</tr>
+<tr>
+<td><strong>With several blocks, the first one that calls a tool</strong></td>
+<td>The first block; the last block; every block</td>
+<td>Measured on 1,502 saved replies (section <a href="#s29-1">29.1</a>)</td>
+</tr>
+<tr>
+<td><strong>History limited by budget</strong></td>
+<td>Full history; a fixed window</td>
+<td>Section <a href="#s19-4">19.4</a></td>
+</tr>
+<tr>
+<td><strong>A per-request input cap only for the model that needs it</strong></td>
+<td>The same cap for every model</td>
+<td>A cap for all would change runs that already pass (section <a href="#s26-3">26.3</a>)</td>
+</tr>
+<tr>
+<td><strong>Bounded tool outputs</strong>, except the patch</td>
+<td>Returning them in full</td>
+<td>Every observation is resent many times; the patch is the deliverable and is not cut</td>
+</tr>
+<tr>
+<td><strong><code>edit_file</code> rejects</strong> ambiguous, no-op or non-compiling edits</td>
+<td>Applying the first match and always confirming</td>
+<td>Confirming a change that does not exist makes the model repeat the same edit</td>
+</tr>
+<tr>
+<td><strong>Echo of the block's last expression</strong>, like the Python interpreter</td>
+<td>Showing only what is printed with <code>print</code></td>
+<td>Models call tools without <code>print</code> and got empty observations</td>
+</tr>
+</tbody>
+</table></div></section><section id="s21"><h2><span class="num">21</span><span class="h2-texto">Extracting code from the response</span></h2><h3 id="s21-1">21.1 The requested format</h3>
+<p>The prompt asks for a short thought, <strong>one closed Python block</strong> (opened with three backticks and
+<code>python</code>, closed with three backticks) and the <code>&lt;end_code&gt;</code> marker. That marker is also a stop
+sequence: the provider cuts the response there, and the model never gets to invent the observation.</p>
+<p>The code is extracted from the block and its syntax is checked <strong>before</strong> running it.</p>
+<p><strong>When a reply contains several closed blocks</strong>, only one runs. It is <strong>the first block that calls a
+tool or <code>final_answer</code> and compiles</strong>. The tool names are the ones discovered on the MCP server, so
+nothing is written by hand. If no block calls a tool, the first block runs.</p>
+<p>The reason is that models often write an <strong>example</strong> before the real action: the definition of the
+function they are about to fix, an <code>if</code> they plan to insert, an <code>import</code>. Running the first block ran
+that example, and the model received an observation about code it never meant to execute. The other
+obvious rules are worse: the last block often is <code>final_answer(get_patch())</code> written right after
+the action, so it would submit before seeing the result; and running every block executes the
+examples too. Section <a href="#s29-1">29.1</a> tells how this was found and measured.</p>
+<h3 id="s21-2">21.2 What happens when the format is not followed</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>What is done</th>
+<th>What the model receives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Empty response</td>
+<td>Nothing runs</td>
+<td>"Model response was empty"</td>
+</tr>
+<tr>
+<td>No Python block</td>
+<td>A call translation is attempted (section <a href="#s21-3">21.3</a>)</td>
+<td>If there is nothing to translate, that no code was found</td>
+</tr>
+<tr>
+<td>Unclosed block</td>
+<td><strong>Not run</strong></td>
+<td>That the closing fence is missing</td>
+</tr>
+<tr>
+<td>Syntax error</td>
+<td>Not run</td>
+<td>The line and the reason</td>
+</tr>
+<tr>
+<td>The thought is inside the block and a second block is inside it</td>
+<td>The second block runs</td>
+<td>Its result</td>
+</tr>
+</tbody>
+</table></div>
+<p>An unclosed block is not run because it may be truncated: running half an edit is worse than
+running nothing.</p>
+<h3 id="s21-3">21.3 Call formats that are translated</h3>
+<p>Many models, especially after seeing a tool result, stop writing the Python block and use the call
+format they were trained on. Agent Smith translates two of them into an equivalent Python line,
+always of the form <code>print(tool(argument=value))</code>:</p>
+<ul>
+<li><strong><code>&lt;tool_call&gt;</code> with <code>&lt;arg_key&gt;</code> and <code>&lt;arg_value&gt;</code> pairs.</strong> The value markers are treated as
+  optional, because with long values models forget one of the two.</li>
+<li><strong><code>&lt;tool_use&gt;</code> with <code>&lt;tool_name&gt;</code> and JSON arguments.</strong></li>
+</ul>
+<p>There is a third case: some providers return a <strong>native call</strong> through the API's function channel,
+with no text. The provider client converts it to the <code>&lt;tool_use&gt;</code> format, so there is only one place
+where a call becomes Python.</p>
+<p>Two translation rules:</p>
+<ul>
+<li><strong>Always with <code>print</code></strong>: without it, the result would not appear in the observation.</li>
+<li><strong>Values are written as Python literals</strong>, never as code. A value with quotes or line breaks
+  becomes an inert string, so it cannot inject statements.</li>
+</ul>
+<p>When the code comes from a translation, the observation says so. The subject requires a notice
+when a malformed block is interpreted anyway.</p>
+<h3 id="s21-4">21.4 Formats that are not translated</h3>
+<p>The XML <code>&lt;invoke&gt;</code> format and the ReAct format (<code>Action:</code> / <code>Action Input:</code>), which the subject gives
+as examples, are not implemented because none of the models used has produced them. If one appeared,
+another translation would be added next to the existing ones.</p></section><section id="s22"><h2><span class="num">22</span><span class="h2-texto">Sandbox controls</span></h2><h3 id="s22-1">22.1 The controls, one by one</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Control</th>
+<th>How it is applied</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Imports</strong></td>
+<td>A custom importer checks <code>authorized_imports</code>. It accepts patterns such as <code>collections.*</code>, rejects relative imports and <code>import *</code>, and also checks submodules requested with <code>from … import …</code></td>
+</tr>
+<tr>
+<td><strong>Builtins</strong></td>
+<td>An <strong>explicit list</strong> of allowed builtins is built. <code>eval</code>, <code>exec</code> and <code>compile</code> are not in it. <code>__import__</code> and <code>open</code> are replaced with controlled versions</td>
+</tr>
+<tr>
+<td><strong>Files</strong></td>
+<td><code>open</code> resolves the full path (following <code>..</code> and links) and checks that it <strong>belongs</strong> to an allowed directory. An empty list allows nothing</td>
+</tr>
+<tr>
+<td><strong>Network</strong></td>
+<td><code>socket</code> is not in the import list. On top of that, its connection functions are replaced with one that raises an error, in case an allowed library tried to use them</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>An operating-system limit on the worker's memory space, applied before it accepts code</td>
+</tr>
+<tr>
+<td><strong>Time</strong></td>
+<td>Applied by the agent from outside: if the block does not finish in time, it kills the worker</td>
+</tr>
+<tr>
+<td><strong>Environment</strong></td>
+<td>The worker clears its environment variables and runs in a temporary directory</td>
+</tr>
+</tbody>
+</table></div>
+<p>The import and builtin restrictions apply <strong>only to the namespace of the model's code</strong>. The rest of
+the worker runs normal Python.</p>
+<h3 id="s22-2">22.2 Output is limited too</h3>
+<p>A block's output is kept up to <strong>12,000 characters</strong>, with a notice saying how many were omitted.
+Without that cap, a <code>print</code> inside a loop would fill the observation, which is then resent with every
+request. <strong>The final answer is never cut.</strong></p>
+<h3 id="s22-3">22.3 Two clocks</h3>
+<p>Two deadlines run at once during a block, and whichever runs out first wins:</p>
+<ul>
+<li><strong>The block clock</strong>: <code>max_execution_time_seconds</code>. It <strong>does not count time spent waiting for MCP
+  tools</strong>, because that time is spent by a trusted tool, not by the model's code. The subject says so
+  explicitly: the sandbox timeout only applies to code running inside it.</li>
+<li><strong>The task deadline</strong>: 120 or 900 seconds minus the cleanup reserve. <strong>It discounts nothing</strong>,
+  because the moulinette measures real time.</li>
+</ul>
+<p>If <code>run_tests</code> takes twenty seconds in Docker, the block is not penalised, but the task does spend
+those twenty seconds.</p>
+<p>When a deadline runs out during a block, the agent kills the worker. In the <code>sandbox</code> command a new
+one is started with a warning that variables were lost; in the agent, the task ends with the error
+recorded.</p>
+<h3 id="s22-4">22.4 Exceptions from generated code</h3>
+<p>If the model's code raises <code>SystemExit</code> or <code>KeyboardInterrupt</code>, it is treated as that block's error:
+the model is told in the observation and the worker keeps running. They are not silently swallowed.
+A real Ctrl+C from the user reaches the agent, which closes the worker and the other resources.</p>
+<p><code>final_answer</code> works by raising its own exception carrying the answer. The worker recognises it
+before any other error, stops the block and sends the answer to the agent.</p>
+<h3 id="s22-5">22.5 What these controls do not protect against</h3>
+<ul>
+<li>The memory limit applies to the <strong>virtual address space</strong>, which is not exactly the physical memory
+  used.</li>
+<li>Restricting imports and <code>open</code> does not control everything an allowed library might do.</li>
+<li>There is no defence against <strong>hostile Python introspection</strong> (section <a href="#s6-4">6.4</a>).</li>
+<li>The boundary is a <strong>process</strong>, not a container or an operating-system mechanism.</li>
+</ul>
+<p>These are known and accepted limits: the subject requires the standard library only, and these
+controls cover what it asks for.</p></section><section id="s23"><h2><span class="num">23</span><span class="h2-texto">Docker in Agent Smith</span></h2><p>Docker is used in two different ways.</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th></th>
+<th>MBPP</th>
+<th>SWE-bench</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Image</td>
+<td>Clean Python (<code>python:3.11-slim</code>), the same one the moulinette validates with</td>
+<td>The task's, with the repository in <code>/testbed</code></td>
+</tr>
+<tr>
+<td>How many containers</td>
+<td><strong>One per <code>run_tests</code> call</strong></td>
+<td><strong>One per task</strong></td>
+</tr>
+<tr>
+<td>Who creates it</td>
+<td>The MCP server</td>
+<td>The agent</td>
+</tr>
+<tr>
+<td>How long it lives</td>
+<td>Seconds</td>
+<td>The whole task</td>
+</tr>
+<tr>
+<td>How it is cleaned up</td>
+<td><code>--rm</code> and a sweep by label</td>
+<td>It stops when its standard input is closed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s23-1">23.1 MBPP: one container per test run</h3>
+<p><code>run_tests</code> combines the test imports, the candidate code and the assertions into one program, and
+runs it in a new container:</p>
+<ul>
+<li><strong>without network</strong> and with <strong>128 MB</strong> of memory, with no CPU limit (section <a href="#s30-2">30.2</a>);</li>
+<li>with <strong><code>--rm</code></strong>, so it disappears when done;</li>
+<li>with a <strong>label</strong> identifying the task's session;</li>
+<li>with <strong><code>--pull never</code></strong>: the image must already be available. If it is missing, <code>run_tests</code>
+  reports a Docker error instead of downloading it during the task (section <a href="#s30-3">30.3</a>).</li>
+</ul>
+<p>The image is the one the moulinette uses to validate MBPP solutions. Using the same one means a
+solution that passes here was tested on the interpreter that will judge it, and only one image has
+to be downloaded in advance.</p>
+<p>The time limit is 10 seconds, or less if the task deadline is near. If it runs out, the container is
+removed explicitly, because stopping the <code>docker</code> command does not stop the container.</p>
+<p>The result states whether the tests passed, a message, the output (limited to 12,000 characters) and
+the exit code. Exit code <strong>125</strong> is treated as a failure of Docker itself, for example a missing
+image, not as a test failure.</p>
+<p>When the task ends, <strong>after closing the MCP server</strong>, the agent removes any container still carrying
+its session label. The order matters: if the server had died, it could no longer delete its own
+containers.</p>
+<h3 id="s23-2">23.2 SWE-bench: one container per task</h3>
+<p>The agent checks whether the task image exists, downloads it if needed and starts a container
+<strong>without network</strong> and with a unique name. It waits until it is running and checks that it contains
+<code>/testbed</code>.</p>
+<p>The MCP server's tools run each operation with <code>docker exec</code> inside that container. Some details:</p>
+<ul>
+<li><strong>Paths are always expressed as <code>/testbed/...</code></strong>. A path that leaves the repository is rejected.</li>
+<li><strong>The model's arguments travel as separate elements of the command</strong>, never inside a string
+  interpreted by the shell. That way a text with quotes or line breaks cannot turn into another
+  command, and <code>edit_file</code> can replace multi-line blocks without escaping them.</li>
+<li><strong>Outputs are limited to 4,000 characters</strong> (the beginning and the end are kept) and searches to
+  <strong>50 matches</strong>. <code>get_patch</code> is never cut.</li>
+<li><strong><code>run_tests</code></strong> runs the task's evaluation script and returns the part between its start and end
+  markers, which is where the test result is.</li>
+<li><strong><code>edit_file</code></strong> rejects the edit if the text does not appear exactly once (and says on which lines
+  it appears if there are several), if the new text is identical to the old one, or if the resulting
+  Python file does not compile.</li>
+<li><strong><code>find_references</code></strong> is a text search for the name, not an analysis of the program.</li>
+</ul>
+<p>The same tools can also work <strong>without a container</strong>, on a host folder given by an environment
+variable. This is useful for testing the tools on their own, and paths still look like
+<code>/testbed/...</code> to the model.</p>
+<h3 id="s23-3">23.3 The <code>kill -9</code> problem</h3>
+<p>A robust agent should leave no container behind <strong>even if it is killed with <code>kill -9</code></strong> while a task
+is running.</p>
+<p>No cleanup written in the agent can help: with <code>kill -9</code> nothing runs (section <a href="#s7-4">7.4</a>). And since the
+container is not a child process of the agent (section <a href="#s8-1">8.1</a>), it does not die with it.</p>
+<p>The solution is to make <strong>the container depend on something the operating system closes by
+itself</strong>:</p>
+<ol>
+<li>The agent runs <code>docker run -i --rm … &lt;image&gt; cat</code> and keeps that command's <strong>standard input</strong>
+   open.</li>
+<li>Inside the container, the main process is <code>cat</code>, which reads its input and <strong>ends when it
+   receives "end of file"</strong>.</li>
+<li>If the agent dies, <strong>in any way</strong>, the operating system closes its pipes.</li>
+<li><code>cat</code> receives end of file and ends, the container stops and <code>--rm</code> removes it.</li>
+</ol>
+<p>A normal exit works the same way: the agent closes the pipe and, to be safe, also runs
+<code>docker rm -f</code>.</p>
+<p>The usual alternative, keeping the container alive with a command that never ends, leaves it
+orphaned in exactly this case.</p>
+<h3 id="s23-4">23.4 MBPP and <code>kill -9</code></h3>
+<p>MBPP containers do not use that technique because they live for a few seconds and carry <code>--rm</code>. If
+the agent is killed with <code>kill -9</code> exactly while one is running, it could remain until its program
+finishes. It is a small, accepted risk given how short that window is.</p></section><section id="s24"><h2><span class="num">24</span><span class="h2-texto">The provider</span></h2><h3 id="s24-1">24.1 Model selection</h3>
+<p>The project has a <strong>models configuration file</strong> with a list of entries. Each entry describes a
+specific model from a specific provider:</p>
+<ul>
+<li>base URL and model name;</li>
+<li><strong>names of the environment variables</strong> holding its keys (never the keys);</li>
+<li>maximum time per request and maximum number of retries;</li>
+<li>temperature and stop sequences;</li>
+<li>maximum output tokens <strong>per request</strong>;</li>
+<li>optionally, maximum input tokens <strong>per request</strong> (section <a href="#s19-4">19.4</a>);</li>
+<li>reasoning options, for models that support them.</li>
+</ul>
+<p>The command receives the model and the URL, and the client looks for <strong>exactly one</strong> matching entry.
+If there are zero or more than one, the task does not start. There is no automatic model switching:
+each result belongs to the requested model.</p>
+<p>The file path can be given with an environment variable; if not, the configuration file included in
+the repository is used.</p>
+<p>Through a router (section <a href="#s4-4">4.4</a>), a request with stop sequences also asks the router to use <strong>only
+providers that honour every parameter</strong>. Without that, the request could be forwarded to a provider
+that ignores <code>stop</code>, and the model would invent observations again.</p>
+<h3 id="s24-2">24.2 Keys</h3>
+<p>The client reads every key variable of the entry that exists and removes duplicates. If it finds
+none, the task does not start.</p>
+<p>Keys <strong>never appear in a message</strong>: they are registered so the logging system replaces them with
+neutral text, and the provider's error messages are cleaned before being stored, because some
+providers include the key in the error.</p>
+<h3 id="s24-3">24.3 The attempts of one request</h3>
+<p>Every time the loop asks for a response, the client makes <strong>one or more attempts</strong>, up to the
+configured maximum. Before each attempt it checks:</p>
+<ol>
+<li><strong>That the key is available.</strong> Each key remembers until when it must not be used. If the wait is
+   under a minute, it waits; if longer, it stops, because that means every key is exhausted and
+   waiting would only burn the task's time.</li>
+<li><strong>That there is time left.</strong></li>
+<li><strong>That the request's token estimate fits in what is left.</strong> The estimate uses the text size (about
+   four bytes per token plus a margin): it is not exact, but it avoids sending a request that would
+   certainly exceed the limit.</li>
+<li><strong>How many output tokens to ask for</strong>: the smaller of what is left for the task and the per-request
+   maximum.</li>
+</ol>
+<p>Then, depending on the response:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Response</th>
+<th>Usage</th>
+<th>What the client does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>429</strong></td>
+<td>Known zero</td>
+<td>Records how long to wait from <code>retry-after</code>, <strong>switches to the key that will be available soonest</strong> and retries</td>
+</tr>
+<tr>
+<td><strong>500, 502, 503, 504</strong></td>
+<td>Known zero</td>
+<td>Records a short wait and retries</td>
+</tr>
+<tr>
+<td><strong>Other 4xx</strong> (400, 401, 404…)</td>
+<td>Known zero</td>
+<td>Stops: repeating would not fix it</td>
+</tr>
+<tr>
+<td><strong>Timeout or lost connection</strong></td>
+<td><strong>Unknown</strong></td>
+<td>Stops and marks usage as incomplete</td>
+</tr>
+<tr>
+<td><strong>200 without complete <code>usage</code></strong></td>
+<td><strong>Unknown</strong></td>
+<td>Stops, keeps what was added up so far and says so</td>
+</tr>
+<tr>
+<td><strong>200 that exceeds the budget</strong></td>
+<td>Measured</td>
+<td>Stops with an error</td>
+</tr>
+<tr>
+<td><strong>200 without text</strong></td>
+<td>Measured</td>
+<td>Retries; if attempts run out, the error is recoverable (section <a href="#s19-3">19.3</a>)</td>
+</tr>
+<tr>
+<td><strong>200 with a native call and no text</strong></td>
+<td>Measured</td>
+<td>Converts it to text (section <a href="#s21-3">21.3</a>)</td>
+</tr>
+<tr>
+<td><strong>200 with text</strong></td>
+<td>Measured</td>
+<td>Returns the response</td>
+</tr>
+</tbody>
+</table></div>
+<p>The SDK's own retries are <strong>disabled</strong>: if the SDK retried on its own, those requests would not show
+up in <code>total_requests</code>.</p>
+<h3 id="s24-4">24.4 Known and unknown usage</h3>
+<p>This distinction explains almost all of the table above:</p>
+<ul>
+<li>If the provider <strong>rejects</strong> the request (4xx or 5xx), it generated nothing: its missing <code>usage</code> is a
+  <strong>known zero</strong>, and retrying hides no consumption.</li>
+<li>If it answers <strong>200 without <code>usage</code></strong>, or the response never arrives, the model may have generated
+  something and <strong>nobody knows how much</strong>. Retrying would add unknown usage to unknown usage, so it
+  stops and the result states that the totals are <strong>known subtotals</strong>.</li>
+</ul>
+<p>One detail of ordering matters here: if a rejection were marked as unknown usage, the task would stop
+before reaching key rotation, and the second key would never be used.</p>
+<h3 id="s24-5">24.5 What is recorded for each iteration</h3>
+<ul>
+<li><strong><code>input_tokens</code> and <code>output_tokens</code></strong>: the measured sum of all attempts in that iteration.</li>
+<li><strong><code>retries</code></strong>: the number of attempts minus one.</li>
+<li><strong><code>request_time_ms</code></strong>: the summed time of the attempts.</li>
+<li><strong><code>model_name</code></strong>: the model <strong>the API says</strong> it used, which through a router may differ from the one
+  requested (section <a href="#s4-4">4.4</a>). The <strong>requested</strong> model is a separate piece of data, the one in the
+  configuration, and it is the one sent in the request.</li>
+</ul></section><div class="parte" id="p-part-iii"><p class="parte-etiqueta">Part III</p><h2 class="parte-titulo">A SWE-bench task from start to finish</h2><p>Section <a href="#s10">10</a> explains what SWE-bench is, and Part II describes the pieces separately. This part
+follows a real task from the moment it exists as a file until the moulinette considers it solved.</p></div><section id="s25"><h2><span class="num">25</span><span class="h2-texto">SWE-bench from start to finish</span></h2><h3 id="s25-1">25.1 Where tasks come from</h3>
+<p>The moulinette takes its tasks from the <strong>SWE-bench Verified</strong> set (section <a href="#s10-1">10.1</a>). For first tests,
+the subject suggests <code>sympy__sympy-14711</code>, <code>sympy__sympy-13480</code> and <code>pydata__xarray-4629</code>.</p>
+<p><code>moulinette_eval dump swebench --task-id &lt;task&gt;</code> writes a <code>task.json</code>. These are its fields for the
+task <code>sympy__sympy-13480</code>:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>instance_id</code></td>
+<td><code>sympy__sympy-13480</code></td>
+</tr>
+<tr>
+<td><code>repo</code></td>
+<td><code>sympy/sympy</code></td>
+</tr>
+<tr>
+<td><code>problem_statement</code></td>
+<td>The issue text: ".subs on coth(log(tan(x))) errors for certain integral values", with the failing code and the error it produces</td>
+</tr>
+<tr>
+<td><code>hints_text</code></td>
+<td>Comments from the discussion. For this task: "There is a typo on line 590: <code>cotm</code> should be <code>cothm</code>"</td>
+</tr>
+<tr>
+<td><code>docker_image</code></td>
+<td><code>swebench/sweb.eval.x86_64.sympy_1776_sympy-13480:latest</code></td>
+</tr>
+<tr>
+<td><code>eval_script</code></td>
+<td>A bash script that runs the tests (section <a href="#s25-6">25.6</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Agent Smith receives this file with <code>--task-file</code> and validates it with the <code>SWEBenchTaskInput</code>
+model.</p>
+<h3 id="s25-2">25.2 What the image contains</h3>
+<p>SWE-bench prepares one image per task. Each one contains:</p>
+<ul>
+<li>the repository in <strong><code>/testbed</code></strong>, at the commit <strong>before</strong> the fix: the bug is still there;</li>
+<li>a conda environment called <strong><code>testbed</code></strong>, with the exact Python version and dependencies that
+  commit needs;</li>
+<li><code>/testbed</code> as the default working directory.</li>
+</ul>
+<p>In practice it is a miniature computer with the project ready to run and the bug still unfixed.</p>
+<p>Images take up <strong>several gigabytes</strong>. If one is not available, Agent Smith downloads it at the start
+of the task, and <strong>that time counts within the 900 seconds</strong>: the clock starts before the download.
+That is why it is worth downloading task images in advance.</p>
+<h3 id="s25-3">25.3 Two different places: the host and the container</h3>
+<p>It is important to tell apart where each thing happens:</p>
+<pre><code>HOST COMPUTER                                        TASK CONTAINER (no network)
+┌────────────────────────────────────────┐          ┌──────────────────────────────┐
+│ Agent    keys, loop, limits            │          │ /testbed   repository        │
+│ Worker   the model's code              │          │ conda &quot;testbed&quot; dependencies │
+│ MCP server  tools ─────────────────────┼─docker──▶│ tests, git diff, edits       │
+│                                        │   exec   │                              │
+└────────────────────────────────────────┘          └──────────────────────────────┘
+</code></pre>
+<ul>
+<li><strong>The code the model writes runs in the worker, on the host</strong>, under the sandbox restrictions. From
+  there it cannot import the project or read <code>/testbed</code> directly.</li>
+<li><strong>The repository and its tests are in the container.</strong> To touch them, the model's code calls the
+  tools, and the MCP server runs them inside the container with <code>docker exec</code>.</li>
+<li>If the model needs to <strong>run the project's code</strong> (for example, to reproduce the error), it uses
+  <code>run_command</code>, which runs the command inside the container, in the <code>testbed</code> environment.</li>
+</ul>
+<p>This is option (b) allowed by the subject: sandbox on the host and MCP tools that reach into the
+container.</p>
+<h3 id="s25-4">25.4 What Agent Smith does at the start</h3>
+<ol>
+<li><strong>Records the start time</strong>, reads the task and computes the deadline: 900 seconds minus 20 kept
+   for cleanup.</li>
+<li><strong>Prepares the provider client</strong> with the given model and URL.</li>
+<li><strong>Gets the image</strong>: <code>docker image inspect &lt;image&gt;</code>; if it does not exist, <code>docker pull &lt;image&gt;</code>.</li>
+<li><strong>Starts the container</strong>:
+   <code>docker run -i --rm --name agent-smith-&lt;random&gt; --network none &lt;image&gt; cat</code>
+   - <code>--network none</code>: the project's code cannot reach the internet.
+   - <code>cat</code> and <code>-i</code>: the container lives as long as the agent keeps its standard input open. If the
+     agent dies, even with <code>kill -9</code>, the container stops and <code>--rm</code> removes it (section <a href="#s23-3">23.3</a>).</li>
+<li><strong>Waits until it is running</strong> and checks with <code>docker exec</code> that <code>/testbed</code> has content.</li>
+<li><strong>Starts the SWE-bench MCP server</strong> and passes it, through environment variables, the container
+   name, the <code>eval_script</code> and the task deadline.</li>
+<li><strong>Discovers the tools</strong> and checks that all nine are there.</li>
+<li><strong>Builds the two initial messages</strong> (section <a href="#s25-5">25.5</a>) and <strong>starts the worker</strong>.</li>
+<li><strong>Enters the loop</strong> (section <a href="#s19">19</a>).</li>
+</ol>
+<h3 id="s25-5">25.5 How it knows what to fix</h3>
+<p><strong>Only from the text it receives.</strong> Nobody tells it which file is wrong or what the fix is.</p>
+<p><strong>The system prompt</strong> teaches it a method, not a solution:</p>
+<ol>
+<li>Locate the code: <code>search_function_or_class_definition_in_code</code> for a definition, <code>search_code</code>
+   for a pattern and <code>find_references</code> to see who uses something.</li>
+<li>Read it with <code>read_file</code> before changing anything.</li>
+<li>Make the smallest change with <code>edit_file</code>, including enough context for the searched text to
+   appear only once.</li>
+<li>Run <code>run_tests</code> and read the result: a failure shows what to correct.</li>
+<li>When the tests pass, submit <code>final_answer(get_patch())</code>, and never before <code>get_patch</code> shows
+   changes.</li>
+</ol>
+<p>It also explains that the code runs in a sandbox that cannot import the project, that only what it
+prints comes back as an observation, that it must not invent observations and that it must not look
+for the official fix or a remembered patch. At the end it includes the tools <strong>manual</strong>.</p>
+<p><strong>The task message</strong> contains the identifier, the repository, the issue text, the hints if any, and
+the sentence "The checkout is at /testbed. Inspect it before editing."</p>
+<p>From there, the model reasons as a person would. In this example, the issue says that
+<code>coth(log(tan(x)))</code> fails and the error points to <code>hyperbolic.py</code>, so the sensible first step is to
+find where <code>coth</code> is defined. In this task the hint almost gives the answer away. Other tasks have
+no hints, or much less clear ones. Using them is legitimate: they are part of the task the moulinette
+provides.</p>
+<p><strong>What the agent does not see:</strong></p>
+<ul>
+<li><strong>The original fix</strong>: it is neither in the image nor in the task.</li>
+<li><strong>The new tests that will decide the result</strong>: they are not in the image's repository; the
+  evaluation script adds them when it runs and removes them when it finishes (section <a href="#s25-6">25.6</a>).</li>
+<li><strong>The <code>eval_script</code></strong>: the MCP server holds it, not the container or the prompt. The model only
+  sees the result of running it.</li>
+<li><strong>The internet</strong>: neither the worker nor the container has network access.</li>
+</ul>
+<h3 id="s25-6">25.6 The evaluation script and <code>run_tests</code></h3>
+<p>Every task comes with its <code>eval_script</code>. For <code>sympy__sympy-13480</code> it does this, in order:</p>
+<ol>
+<li>Activates the <code>testbed</code> environment and enters <code>/testbed</code>.</li>
+<li>Shows the git status and <strong>reinstalls the project</strong> (<code>pip install -e .</code>), so the code is used as
+   it is at that moment, with the agent's changes.</li>
+<li><strong>Restores the test file</strong> to its original version and <strong>adds the new tests</strong> with a small patch.
+   In this case, two assertions in <code>test_hyperbolic.py</code>:
+   <code>assert coth(log(tan(2))) == coth(log(-tan(2)))
+   assert coth(1 + I*pi/2) == tanh(1)</code>
+   They are exactly the cases from the issue: they fail with the original code and pass with the fix.</li>
+<li>Writes the marker <code>&gt;&gt;&gt;&gt;&gt; Start Test Output</code>, runs the tests of that file and writes
+   <code>&gt;&gt;&gt;&gt;&gt; End Test Output</code>.</li>
+<li><strong>Puts the test file back as it was</strong>, so it is not part of the patch.</li>
+</ol>
+<p>The <strong><code>run_tests</code></strong> tool runs this script inside the container and <strong>returns only what is between the
+two markers</strong>, which is where the test result is. The rest (installation, git status) would only use
+up tokens. If it cannot find the markers, it returns the whole output, truncated.</p>
+<p>This way the agent can tell whether its fix works <strong>without ever seeing the tests</strong> or the fix.</p>
+<h3 id="s25-7">25.7 Real example: the task solved in five iterations</h3>
+<blockquote>
+<p><strong>Example.</strong> A run of Agent Smith on this task in September 2026 with the <code>codestral-2508</code> model.
+The data comes from that run's <code>solution.json</code>.</p>
+</blockquote>
+<p>Each row is one iteration. The middle column is the <code>sandbox_input</code> (the code the model wrote) and the
+right column a summary of the <code>sandbox_output</code> (the observation it received):</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Code written by the model</th>
+<th>Observation received</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>print(search_function_or_class_definition_in_code(name="coth"))</code></td>
+<td><code>/testbed/sympy/functions/elementary/hyperbolic.py:537: class coth(HyperbolicFunction):</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>print(read_file(filepath="/testbed/sympy/functions/elementary/hyperbolic.py", start_line=585, end_line=595))</code></td>
+<td>The numbered lines. Line 589 is <code>cothm = coth(m)</code> and line 590, <code>if cotm is S.ComplexInfinity:</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>print(edit_file(filepath=".../hyperbolic.py", old_str="if cotm is S.ComplexInfinity:", new_str="if cothm is S.ComplexInfinity:"))</code></td>
+<td><code>Edit applied successfully.</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>print(run_tests())</code></td>
+<td>The list of tests, ending in <code>tests finished: 45 passed</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>final_answer(get_patch())</code></td>
+<td>The patch</td>
+</tr>
+</tbody>
+</table></div>
+<p>Behind each row there is a full iteration: request to the model, block extraction, execution in the
+worker, tool request to the agent, MCP call to the server, <code>docker exec</code> in the container and the
+result coming back as an observation (section <a href="#s16-3">16.3</a>).</p>
+<p>Totals: 5 iterations, 9,772 input tokens, 222 output tokens and 13 seconds.</p>
+<p>The submitted solution:</p>
+<pre><code class="language-diff">diff --git a/sympy/functions/elementary/hyperbolic.py b/sympy/functions/elementary/hyperbolic.py
+@@ -587,7 +587,7 @@ def eval(cls, arg):
+                 x, m = _peeloff_ipi(arg)
+                 if m:
+                     cothm = coth(m)
+-                    if cotm is S.ComplexInfinity:
++                    if cothm is S.ComplexInfinity:
+                         return coth(x)
+</code></pre>
+<h3 id="s25-8">25.8 The tools in practice</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Typical use</th>
+<th>What it returns</th>
+<th>Limits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>search_function_or_class_definition_in_code</code></td>
+<td>Finding where something named in the issue is defined</td>
+<td><code>path:line: content</code></td>
+<td>50 matches</td>
+</tr>
+<tr>
+<td><code>search_code</code></td>
+<td>Searching for text or a regular expression</td>
+<td><code>path:line: content</code></td>
+<td>50 matches</td>
+</tr>
+<tr>
+<td><code>find_references</code></td>
+<td>Seeing who uses a function or class</td>
+<td><code>path:line: content</code> (text search for the name)</td>
+<td>50 matches</td>
+</tr>
+<tr>
+<td><code>list_files</code></td>
+<td>Getting oriented in a folder</td>
+<td>One path per line</td>
+<td>4,000 characters</td>
+</tr>
+<tr>
+<td><code>read_file</code></td>
+<td>Reading a range of lines</td>
+<td><code>number: line</code></td>
+<td>4,000 characters</td>
+</tr>
+<tr>
+<td><code>edit_file</code></td>
+<td>Replacing an exact fragment</td>
+<td>Confirmation or the reason for rejection</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>run_command</code></td>
+<td>Reproducing the error, running the project's code</td>
+<td>Exit code, output and errors</td>
+<td>4,000 characters; 120 s</td>
+</tr>
+<tr>
+<td><code>run_tests</code></td>
+<td>Checking the fix</td>
+<td>The part of the script between markers</td>
+<td>4,000 characters</td>
+</tr>
+<tr>
+<td><code>get_patch</code></td>
+<td>Viewing or submitting the changes</td>
+<td>The full diff, or "No changes yet."</td>
+<td><strong>Never truncated</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>When an output exceeds 4,000 characters, <strong>the beginning and the end</strong> are kept with a notice of how
+many characters were omitted. When a search reaches 50 matches, it warns that the pattern should be
+narrowed.</p>
+<p>All paths are expressed as <code>/testbed/...</code>, and any path leaving the repository is rejected.</p>
+<p><code>edit_file</code> rejects three cases and explains why, so the model does not believe it changed something
+it did not:</p>
+<ul>
+<li>the searched text <strong>does not appear</strong>, or <strong>appears several times</strong> (it says on which lines);</li>
+<li>the new text is <strong>identical</strong> to the old one;</li>
+<li>the resulting Python file <strong>would not compile</strong>.</li>
+</ul>
+<h3 id="s25-9">25.9 The patch</h3>
+<p><code>get_patch</code> runs <code>git -c core.fileMode=false diff</code> inside the container:</p>
+<ul>
+<li><code>git diff</code> shows the changes against the repository's commit, that is, everything the agent has
+  edited.</li>
+<li><code>core.fileMode=false</code> makes git <strong>ignore file permission changes</strong>, which are not code changes and
+  would clutter the patch. It is the command the subject specifies.</li>
+</ul>
+<p>Since the <code>eval_script</code> restores the test file when it finishes, the patch only contains the agent's
+changes. If there are no changes, <code>get_patch</code> returns "No changes yet.". That is why, after the loop,
+the agent checks that the final answer contains <code>diff --git</code>: if not, the task is marked as failed
+even if the model called <code>final_answer</code>.</p>
+<h3 id="s25-10">25.10 After submission</h3>
+<p><strong>In Agent Smith:</strong></p>
+<ol>
+<li>The worker and the MCP server are closed.</li>
+<li><code>cat</code>'s standard input is closed: the container stops and <code>--rm</code> removes it. To be safe,
+   <code>docker rm -f</code> is also run.</li>
+<li><code>solution.json</code> is written with the patch, every step and the totals. If cleanup fails or the
+   total time exceeds 900 seconds, the result is marked as failed.</li>
+</ol>
+<p><strong>In validation</strong>, the moulinette:</p>
+<ol>
+<li>Checks that the solution looks like a patch.</li>
+<li>Starts <strong>its own clean container</strong> from the same image: it reuses nothing from the agent.</li>
+<li>Applies the patch with <code>git apply</code>, trying more tolerant variants if it fails.</li>
+<li>Runs the same evaluation script.</li>
+<li>Analyses each test's result with SWE-bench's official logic. It requires the tests that had to go
+   green to pass (<strong>FAIL_TO_PASS</strong>) and the ones that already passed to keep passing
+   (<strong>PASS_TO_PASS</strong>). Only a full resolution counts.</li>
+<li>Removes its container.</li>
+<li>Checks the <code>solution.json</code> metrics: iterations, input tokens, output tokens and time.</li>
+</ol>
+<p>Only if both correctness and metrics are right does it print <code>Overall: PASSED</code>.</p>
+<h3 id="s25-11">25.11 Why it sometimes fails</h3>
+<p>The example task is a simple one. In hard ones, failures usually come from the model, not the
+infrastructure:</p>
+<ul>
+<li><strong>It edits the wrong file</strong>, even though the test error points to the right one.</li>
+<li><strong>It gets stuck in a loop</strong>: it repeats the same search or edit, or undoes and redoes its own
+  change.</li>
+<li><strong>It exhausts the 30 iterations or the token budget</strong> before the tests pass.</li>
+<li><strong>It tests by hand and never sees its fix break other tests</strong>: it runs a script with
+  <code>run_command</code> instead of <code>run_tests</code>.</li>
+<li><strong>The provider fails</strong>: quota exhausted, the service overloaded for too long, or a request
+  refused for being too large.</li>
+</ul>
+<p><strong>Before blaming the model, check the agent.</strong> One failure in this list used to read "it writes the
+fix as sandbox code instead of editing the file". Replaying the saved runs showed that, in four of
+the seven cases examined, the reply did contain the <code>edit_file</code> call, in a later block that the agent
+never ran (section <a href="#s29-1">29.1</a>).</p>
+<p>The tool decisions (rejecting edits that change nothing, bounding outputs, returning only the test
+result) exist to give the model clear observations and reduce these failures, but they do not
+eliminate them. Part IV tells what was measured.</p></section><div class="parte" id="p-part-iv"><p class="parte-etiqueta">Part IV</p><h2 class="parte-titulo">Lessons learned</h2><p>This part collects what building and measuring Agent Smith taught between September and October
+2026. Facts about providers and models carry their date: free plans change quickly, so every figure
+here is a snapshot to check again before relying on it. The numbers come from saved <code>solution.json</code>
+files, validated with the moulinette, and most of them are detailed in the project's benchmark
+report.</p></div><section id="s26"><h2><span class="num">26</span><span class="h2-texto">Free models in practice</span></h2><h3 id="s26-1">26.1 Catalogues change without notice</h3>
+<ul>
+<li>Groq retired <code>llama-3.3-70b-versatile</code> within two months of our first tests.</li>
+<li>On 29 September 2026 OpenRouter stopped offering useful free models. The model chosen for MBPP
+  twelve days earlier disappeared with them, and the agent had to move to another provider.</li>
+<li>When a model loses its free variant, its identifier may still exist but answer 404 with a message
+  saying it is not available for free.</li>
+</ul>
+<p>What to do about it:</p>
+<ul>
+<li><strong>Before any session that matters, send one minimal request to each model you depend on</strong> and read
+  the status code: 200, it works; 404, it was retired; 429 or 503, momentary saturation, try again
+  later; 401, a key problem.</li>
+<li><strong>Ask the provider's API, never a third-party list.</strong> A directory of "free models", dated two
+  months earlier, still listed one that no longer was.</li>
+<li><strong>A hand-written test request needs a <code>User-Agent</code> header.</strong> Groq sits behind Cloudflare, and a
+  request without one receives <code>403 error code: 1010</code>, which looks like a revoked key and is not. The
+  official SDK sends the header by itself.</li>
+</ul>
+<h3 id="s26-2">26.2 Quotas, accounts and time</h3>
+<p>Measured with Groq on 18 September 2026, reading the rate-limit headers of a minimal request:</p>
+<ul>
+<li><code>x-ratelimit-limit-requests: 1000</code> and <code>x-ratelimit-reset-requests: 1m26.4s</code>. Those 86.4 seconds
+  are 86,400 / 1,000: <strong>the daily quota is replenished continuously</strong>, one request every 86.4
+  seconds, not at midnight.</li>
+<li>The headers show requests per day and tokens per minute, but <strong>not tokens per day</strong>. That limit
+  has to be tracked by hand.</li>
+<li>Three keys, one request each, all reported 999 requests left. Keys from one account would have
+  shared the counter, and the third would have shown 997. This is a quick way to check that keys
+  are really independent.</li>
+</ul>
+<p>Other providers count differently: with Google AI Studio the quota belongs to the <strong>project</strong> the key
+was created in, and OpenRouter's free models allowed about <strong>50 requests per day</strong> per account. On
+one day all its keys were exhausted by earlier tests, and every task failed with 429. Read each
+provider's terms of use before opening several accounts.</p>
+<p><strong>A 429 costs time, not tokens.</strong> The provider refuses before generating, so the request consumes
+nothing. With Groq's 8,000 tokens per minute, one hard task took 465 seconds with keys from two
+accounts and 93 seconds with three. The extra accounts bought time, not quota: a full run of three
+SWE-bench tasks used about 81,000 tokens, well within the 200,000 tokens per day that the provider
+documents for one account.</p>
+<h3 id="s26-3">26.3 The refusal that no wait fixes</h3>
+<p>Every error Groq returned for <code>qwen/qwen3.8-27b</code> on its free plan named a limit of <strong>7,000 input
+tokens</strong>. Any single request above it is answered with <strong>HTTP 413, "Request too large"</strong>, and is
+never served, however long the client waits. The documentation only mentioned 8,000 tokens per
+minute.</p>
+<p>On 29 September 2026 a run of the hardest task had a correct patch by step 17 (the moulinette
+accepted it afterwards). The next request weighed 7,073 tokens, Groq refused it with 413, and the
+client stopped, as it does with any 4xx other than 429. The history budget of section <a href="#s19-4">19.4</a>, about
+17,000 tokens at that point, had never kept that model under 7,000.</p>
+<p>The fix is the <strong>maximum input per request</strong> of section <a href="#s24-1">24.1</a>, set to 6,000 for that model only. The
+margin is there because the agent's own estimate (about four bytes per token) counted roughly 10%
+fewer tokens than Groq did. In the next full run, the largest request measured 6,425 tokens. A cap
+for every model was rejected: it would change runs that already passed.</p>
+<h3 id="s26-4">26.4 Free means free</h3>
+<p>The subject allows free plans only: no paid plans, purchased credits or accounts with billing
+enabled. Two offers looked useful and break that rule:</p>
+<ul>
+<li><strong>A one-off credit purchase on a router.</strong> On OpenRouter, buying 10 dollars once raises the daily
+  limit of its free models from 50 to 1,000 requests, and those models still cost nothing per token.
+  It is still a purchased credit.</li>
+<li><strong>A provider that needs a card before it generates anything.</strong> Cerebras answered every generation
+  request with <code>HTTP 402 payment_required</code> until a payment method was added. That is a
+  billing-enabled account.</li>
+</ul>
+<h3 id="s26-5">26.5 The same model varies with the hour</h3>
+<ul>
+<li>On the afternoon of 14 September 2026, Google's endpoint returned 503 almost continuously. The runs
+  from that afternoon were discarded and repeated.</li>
+<li>On 18 September 2026 <code>codestral-2508</code> changed within an hour. In the morning its replies were about
+  2,100 characters long and it edited constantly. An hour later they were about 215 characters, with
+  a stray <code>&lt;!-- omit in toc --&gt;</code> at the end, and it read files in a loop: 128 <code>read_file</code> calls
+  against 34 <code>edit_file</code> in 172 steps.</li>
+</ul>
+<p>When a model suddenly behaves very differently, suspect the provider before touching the code, and
+switch to another model rather than change the agent.</p></section><section id="s27"><h2><span class="num">27</span><span class="h2-texto">Choosing a model</span></h2><h3 id="s27-1">27.1 The comparison</h3>
+<p>Ten models ran the same three SWE-bench tasks (<code>sympy__sympy-13480</code>, <code>sympy__sympy-18189</code> and
+<code>django__django-11066</code>) between 14 and 17 September 2026, one run per model and task, all on free
+plans:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th style="text-align: right;">Passed</th>
+<th style="text-align: right;">Iterations</th>
+<th style="text-align: right;">Input tokens</th>
+<th>What stood out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>qwen/qwen3.8-27b</code></td>
+<td style="text-align: right;">3/3</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">54,448</td>
+<td>Slow only because of 429 waits (376 s in total)</td>
+</tr>
+<tr>
+<td><code>codestral-2508</code></td>
+<td style="text-align: right;">3/3</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">34,139</td>
+<td>The fewest tokens; needs an extra stop sequence (section <a href="#s28-3">28.3</a>)</td>
+</tr>
+<tr>
+<td><code>gemini-3.5-flash-lite</code></td>
+<td style="text-align: right;">3/3</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">77,425</td>
+<td>Steady, one retry in 76 steps</td>
+</tr>
+<tr>
+<td><code>dots-3-note-preview</code></td>
+<td style="text-align: right;">3/3</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">88,112</td>
+<td>2.6 times the output tokens of the previous one</td>
+</tr>
+<tr>
+<td><code>ling-3.0-flash-vl</code></td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">90,962</td>
+<td>Once submitted an answer that was not a patch</td>
+</tr>
+<tr>
+<td><code>gemini-3.1-flash-lite</code></td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">515,988</td>
+<td>29 of its 54 steps came back empty</td>
+</tr>
+<tr>
+<td><code>gemini-3.5-flash</code></td>
+<td style="text-align: right;">0/3</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">169,242</td>
+<td>Only 41% of its attempts returned a usable answer</td>
+</tr>
+<tr>
+<td><code>gemini-3.8-flash</code></td>
+<td style="text-align: right;">0/3</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">138,979</td>
+<td>50 s per step</td>
+</tr>
+<tr>
+<td><code>nemotron-3.5-lightning</code></td>
+<td style="text-align: right;">0/3</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">69,790</td>
+<td>23 s per step and request timeouts</td>
+</tr>
+<tr>
+<td><code>gemma-4-31b-it</code></td>
+<td style="text-align: right;">0/3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td>Every request refused with 429</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s27-2">27.2 What decided</h3>
+<ul>
+<li><strong>The hardest task, not the average.</strong> Four models passed the three tasks above. On
+  <code>sympy__sympy-14711</code>, which is much harder, <code>qwen/qwen3.8-27b</code> passed five attempts out of five,
+  <code>codestral-2508</code> about one in nine, and <code>gemini-3.5-flash-lite</code> none (partly because of a bug in the
+  agent, section <a href="#s29-1">29.1</a>). That is why Qwen was chosen on 17 September 2026, with <code>codestral-2508</code> as the
+  first backup.</li>
+<li><strong>Speed per step is a hard limit.</strong> At 50 seconds per step, 30 iterations take 1,500 seconds,
+  more than the 900 allowed, whatever the model's quality.</li>
+<li><strong>Empty answers are expensive.</strong> Each retry resends the whole request, and its input counts
+  against the task's budget. <code>gemini-3.1-flash-lite</code> used all 300,000 input tokens of one task in 22
+  iterations.</li>
+<li><strong>For MBPP, availability decided twice.</strong> The first choice disappeared from its provider on 29
+  September 2026. <code>gemini-3.5-flash-lite</code> replaced it: five randomly drawn tasks out of five on three
+  different days, the third time on a school machine, and four out of five in another run that day.</li>
+</ul>
+<h3 id="s27-3">27.3 How far to trust a comparison</h3>
+<ul>
+<li><strong>One run per cell is a direction, not a rate.</strong> The same agent, model and tasks took 8, 7 and 7
+  iterations one day and 6, 11 and 9 another. A difference smaller than about four iterations per
+  task cannot be told apart from chance.</li>
+<li><strong>A row full of provider errors measures the provider that day</strong> at least as much as the model.</li>
+<li><strong>Measure again before the date that matters.</strong> A choice made in September can be wrong in
+  January.</li>
+</ul></section><section id="s28"><h2><span class="num">28</span><span class="h2-texto">What measuring the agent taught</span></h2><h3 id="s28-1">28.1 Finding the file is not the problem; submitting is</h3>
+<p>Two intermediate metrics (section <a href="#s11-3">11.3</a>) were measured on every passing run:</p>
+<ul>
+<li><strong>The first step that reads or edits a file of the final patch</strong> was 1, 2 or 3, and 2 in most
+  runs. Every model finds the right file quickly.</li>
+<li><strong>The iterations between "the tests pass" and <code>final_answer</code></strong> were between 1 and 3. Some models
+  kept re-running the tests, printing <code>git diff</code> or calling <code>get_patch</code> before submitting. With
+  <code>gemini-3.5-flash-lite</code> on <code>sympy__sympy-13480</code>, the tests passed at step 5 and it submitted at
+  step 8: those last three steps cost 16,628 of the task's 27,767 input tokens, 60%.</li>
+</ul>
+<p>Late steps are the most expensive ones, because each resends the whole grown history.
+<code>codestral-2508</code> and <code>qwen/qwen3.8-27b</code> submitted right after their tests passed in every passing
+run of the comparison.</p>
+<h3 id="s28-2">28.2 A correct fix changes nothing if the model does not use it</h3>
+<p><code>run_tests</code> used to return the first and last 2,000 characters of the evaluation script's output.
+The beginning was <code>git status</code> noise and the end deprecation warnings: <strong>the test summary fell in the
+omitted middle</strong>, and the exit code it reported belonged to the script's last command, not to the
+tests. It was fixed to return only the part between the script's markers (section <a href="#s25-6">25.6</a>).</p>
+<p>The fix was right, and it changed nothing: the model being measured did not call <code>run_tests</code> once in
+four runs, because it tested with its own <code>run_command</code>. The iterations after the tests passed did not
+move either, so the hypothesis behind the fix was wrong. <strong>Measure whether the model uses a piece
+before expecting that piece to help.</strong></p>
+<h3 id="s28-3">28.3 The largest effect came from one line of configuration</h3>
+<p><code>codestral-2508</code> never writes <code>&lt;end_code&gt;</code>, so the stop sequence never fired. After its code block it
+went on writing an invented <code>Observation:</code> (the contents of a file it had not read), then another
+block, until the 600-token cap. Adding <code>"Observation:"</code> to its stop sequences changed this, with the
+same code, tasks and day:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">Without</th>
+<th style="text-align: right;">With</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tasks passed (six tasks)</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td>Replies with an invented observation</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Replies cut at the 600-token cap</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Output tokens</td>
+<td style="text-align: right;">15,975</td>
+<td style="text-align: right;">4,113</td>
+</tr>
+</tbody>
+</table></div>
+<p>On <code>pydata__xarray-4629</code> the run went from an exhausted output budget after 20 iterations to a pass
+in 5. Where the model had invented nothing, the numbers did not move, which is what a change acting
+through a single mechanism should produce. The other models keep a single stop sequence: adding
+the second one to them was never measured.</p>
+<h3 id="s28-4">28.4 Prompt changes that did not help</h3>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Change</th>
+<th>Result</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Removing the warning "the sandbox cannot import the project"</td>
+<td>No measurable difference for that model, which never tried to import anyway</td>
+<td>Kept: three lines, added for a failure seen with another model</td>
+</tr>
+<tr>
+<td>Telling the model "you already ran exactly this code and got exactly this result"</td>
+<td>Ignored: the model repeated the same call until the iteration limit. 1 pass in 4, against 1 in 2 without it</td>
+<td>Discarded</td>
+</tr>
+<tr>
+<td>A second example showing how to finish: edit, test and submit</td>
+<td>Obeyed, but the model still looped, only on a different call; and its failures became more expensive (272,593 input tokens on average, against 179,684)</td>
+<td>Discarded</td>
+</tr>
+<tr>
+<td>A shorter MBPP prompt</td>
+<td>Saved tokens and failed a task the original prompt solved</td>
+<td>Discarded</td>
+</tr>
+</tbody>
+</table></div>
+<p>On the hardest task, a model's loops resisted every wording tried. A change that shows no effect is
+removed rather than kept "just in case".</p>
+<h3 id="s28-5">28.5 Neither the whole history nor a small window</h3>
+<p>With the whole history, one run spent 296,410 of its 300,000 input tokens. With a fixed window of
+the last three exchanges, the model forgot it had already edited a file and re-read the same ranges
+22 times. The budget-based window of section <a href="#s19-4">19.4</a> came from those two failures.</p>
+<h3 id="s28-6">28.6 Refused edits waste many steps</h3>
+<p>In six runs of the hardest task, 47 of the 155 steps, 30%, were edits that <code>edit_file</code> refused, 31
+of them because the searched text did not appear at all ("found 0"). When the text appears several
+times, <code>edit_file</code> says on which lines; when it appears zero times, it says nothing more. Whether a
+hint there would help has not been measured.</p></section><section id="s29"><h2><span class="num">29</span><span class="h2-texto">Bugs that looked like model failures</span></h2><h3 id="s29-1">29.1 The extractor ran the example</h3>
+<p>For two weeks, analyses said that one model "defines the function inside the sandbox instead of
+editing the file". The real cause was the agent.</p>
+<p>At that time the extractor ran <strong>the first closed Python block</strong> of a reply. Running the extractor
+again over every saved reply (217 runs, 1,502 replies) showed 17 steps, in 9 runs, 8 of them failed,
+where the first block was an example and a later block held the real call (<code>edit_file</code>,
+<code>run_command</code> or <code>run_tests</code>). Twelve of the 17 were on the hardest task. In one of them the model had
+written a valid fix at step 27 (the moulinette accepted it when applied by hand); the agent ran the
+example instead, and the run ran out of input budget at step 30.</p>
+<p>Three rules were compared on the same saved replies before changing any code:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Effect on the 1,502 replies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Run the last block</td>
+<td>16 replies would have submitted before seeing the result of their own action</td>
+</tr>
+<tr>
+<td>Run every block</td>
+<td>In 13 of 180 replies with several blocks, the blocks do not compile together, and the examples run too</td>
+</tr>
+<tr>
+<td>Run the first block that calls a discovered tool or <code>final_answer</code></td>
+<td>Fixes exactly the 17 cases and changes none of the other 1,485</td>
+</tr>
+</tbody>
+</table></div>
+<p>The third rule was adopted on 1 October 2026 (section <a href="#s21-1">21.1</a>). <strong>Keeping every reply made this possible:
+a candidate rule can be replayed over all past runs before it is written.</strong></p>
+<h3 id="s29-2">29.2 A correct patch lost to the size of a request</h3>
+<p>Section <a href="#s26-3">26.3</a>: a provider refusal looked like a failed task, and the patch was already right.</p>
+<h3 id="s29-3">29.3 A false pass</h3>
+<p>A model once submitted the text "No changes yet.", which <code>get_patch</code> returns when nothing has been
+edited, and the agent counted it as solved. Since then a SWE-bench answer only counts as a success if
+it contains <code>diff --git</code> (section <a href="#s18">18</a>).</p>
+<h3 id="s29-4">29.4 Timeouts on Python 3.10</h3>
+<p>In an early version, a provider timeout ended the task with the bare message <code>TimeoutError:</code>. On
+Python 3.10, <code>asyncio.TimeoutError</code> is not the built-in <code>TimeoutError</code>; they only became the same
+class in Python 3.11. Catch the exception the library really raises. Today the official SDK reports a
+timeout with its own error class, and the client treats it as unknown usage (section <a href="#s24-4">24.4</a>).</p>
+<h3 id="s29-5">29.5 Estimates are not measurements</h3>
+<p>The agent's token estimate is useful to avoid sending a request that would certainly exceed the
+budget, but it counted about 10% fewer tokens than one provider. Leave a margin when an estimate
+guards a hard limit, and record only what <code>usage</code> reports.</p></section><section id="s30"><h2><span class="num">30</span><span class="h2-texto">Running on shared machines with rootless Docker</span></h2><p>The school machines run <strong>rootless Docker</strong>: the Docker daemon runs as your own user instead of as
+the administrator. Several things that always worked at home failed there on 4 October 2026. All of
+them were solved without changing the agent's logic.</p>
+<h3 id="s30-1">30.1 Where the images go</h3>
+<ul>
+<li><strong>The home folder is too small.</strong> Rootless Docker stores images under your home, and the first
+  download failed with <code>no space left on device</code>.</li>
+<li><strong>A network disk does not work.</strong> On the shared network storage (sgoinfre) the download failed with
+  <code>failed to Lchown "/etc/gshadow" ... invalid argument</code>.</li>
+<li><strong>The machine's local disk (goinfre) works.</strong> Point Docker's data directory there and restart the
+  daemon:</li>
+</ul>
+<pre><code class="language-bash">docker system prune -af
+mkdir -p ~/.config/docker /goinfre/$USER/docker
+echo '{ &quot;data-root&quot;: &quot;/goinfre/'$USER'/docker&quot; }' &gt; ~/.config/docker/daemon.json
+systemctl --user restart docker
+docker info 2&gt;/dev/null | grep &quot;Docker Root Dir&quot;     # must show /goinfre/...
+</code></pre>
+<p>The local disk belongs to one machine and may be wiped, so on another computer the step has to be
+repeated and the images downloaded again. SWE-bench images take between 4 and 7.6 GB each; the disk
+filled up once while they were being downloaded.</p>
+<h3 id="s30-2">30.2 <code>--cpus</code> is rejected</h3>
+<p>The MBPP test container used to run with <code>--cpus 0.5</code>. On rootless Docker it failed with:</p>
+<pre><code>docker: Error response from daemon: NanoCPUs can not be set, as your kernel does not support
+CPU CFS scheduler or the cgroup is not mounted
+</code></pre>
+<p><code>run_tests</code> never started, and the model submitted without having seen a single test result. The
+option was removed; the memory limit kept working. <code>docker info | grep -i rootless</code> tells whether a
+machine runs rootless Docker.</p>
+<h3 id="s30-3">30.3 Download the images in advance</h3>
+<ul>
+<li><strong>The MBPP image</strong> (<code>python:3.11-slim</code>) is downloaded neither by <code>run_tests</code>, which uses
+  <code>--pull never</code>, nor by the moulinette. Without it, <code>run_tests</code> answers "Public tests could not
+  start." with a Docker error, and the moulinette marks correct solutions as failed. Check it with:</li>
+</ul>
+<p><code>bash
+  docker run --rm --network none python:3.11-slim python -c "print('ok')"</code></p>
+<ul>
+<li><strong>SWE-bench images</strong> are downloaded by the agent if they are missing, but inside the task's 900
+  seconds. Download them before.</li>
+<li><strong>A warning sign in any <code>solution.json</code></strong>: an observation saying "Public tests could not start." or
+  "Docker error" means the machine failed, not the model.</li>
+</ul>
+<h3 id="s30-4">30.4 The moulinette, rootless Docker and file owners</h3>
+<p>The agent solved a SWE-bench task on a school machine, but the moulinette's validation failed with:</p>
+<pre><code>failed to Lchown &quot;/tmp/patch.diff&quot; for UID &lt;your UID&gt;, GID &lt;your GID&gt;: lchown /tmp/patch.diff: invalid argument
+</code></pre>
+<p>The moulinette copies the patch into its container as a <code>tar</code> archive, and the archive records your
+user identifier (UID) as the file's owner. Rootless Docker can only assign the identifiers of its own
+range, so it rejects the file. The exception also leaves the moulinette's validation container
+running.</p>
+<p>The fix needs no code change: <strong>run the SWE-bench commands inside <code>rootlesskit bash</code></strong>. <code>rootlesskit</code>
+is the program rootless Docker itself starts with; <code>rootlesskit bash</code> opens a shell inside a <em>user
+namespace</em>, an isolated view of user identifiers in which your user is UID 0. From there the archive
+carries UID 0, which rootless Docker maps back to you. Three SWE-bench tasks were validated this way on
+4 October 2026. MBPP does not copy files into containers and works outside that shell too.</p>
+<h3 id="s30-5">30.5 One Python environment per project</h3>
+<p>If the variable <code>UV_PROJECT_ENVIRONMENT</code> points at a single environment, the agent and the moulinette
+share it, and every <code>uv run</code> uninstalls one project's packages to install the other's (26 packages
+each time). A server started by one of them can lose its packages while it is starting. Unset the
+variable so each project keeps its own environment.</p>
+<p>On a network disk the first run of a fresh environment is also slow, because packages are compiled
+the first time they are imported. A server may take longer than expected to start listening, so run
+everything once before it matters.</p></section><section id="s31"><h2><span class="num">31</span><span class="h2-texto">Stopping the agent</span></h2><p>Section <a href="#s23-3">23.3</a> explains why the SWE-bench container disappears even if the agent is killed with
+<code>kill -9</code>. These are the ways of stopping it that were tested on 15 September 2026:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>How</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kill -9</code> to the agent's Python process</td>
+<td>Container removed in under 6 seconds</td>
+</tr>
+<tr>
+<td>Ctrl+C in the terminal</td>
+<td>Container removed; it prints <code>Interrupted: no solution file was written.</code> and exits with code 130</td>
+</tr>
+<tr>
+<td>SIGTERM to the Python process</td>
+<td>Container removed</td>
+</tr>
+<tr>
+<td><code>kill -9</code> <strong>to the <code>uv</code> process only</strong></td>
+<td>Python keeps running, and so does the container, until the agent ends normally</td>
+</tr>
+</tbody>
+</table></div>
+<p>The last row needs explaining. <code>uv run</code> starts Python as a <strong>child process</strong>. SIGKILL cannot be caught
+(section <a href="#s7-4">7.4</a>), so <code>uv</code> dies without passing anything on, and its child keeps working. The container
+is not orphaned: the agent will close it when it finishes. To stop the agent, kill the Python process,
+for example with <code>pkill -9 -f "bin/python3 -m agent_swebench"</code>, which matches the Python child
+and not <code>uv</code>.</p>
+<p>An earlier version printed a full <code>KeyboardInterrupt</code> traceback on Ctrl+C. Nothing was left behind,
+but a traceback looks like a crash, so it was replaced with that single line.</p></section><section id="s32"><h2><span class="num">32</span><span class="h2-texto">A working method</span></h2><ul>
+<li><strong>Change one thing at a time</strong> and compare with the same model, tasks and day. When conditions are
+  compared over several runs, alternate them, so that the provider's changes during the day affect
+  both alike.</li>
+<li><strong>Keep every <code>solution.json</code></strong> next to its task and its validation, failures included. The most
+  useful bug fix of the project came from replaying them (section <a href="#s29-1">29.1</a>).</li>
+<li><strong>Trust the moulinette, not <code>success</code>.</strong> <code>success</code> is what the agent believes; validation decides.</li>
+<li><strong>Read the step before blaming the model.</strong> Compare <code>llm_output</code>, what the model wrote, with
+  <code>sandbox_input</code>, what the agent ran. If they differ, the problem may be the agent.</li>
+<li><strong>Check the models on the day</strong>, and write every fact about a provider with its date.</li>
+<li><strong>Read where a script writes its results before running it.</strong> Some third-party scripts save their
+  results next to their own folder, which may not be yours.</li>
+<li><strong>Prefer deleting a change that shows no effect.</strong> Every line has to be explained later.</li>
+</ul></section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var enlaces = document.querySelectorAll(".toc a");
+  var movil = document.getElementById("indice-movil");
+  enlaces.forEach(function (a) {
+    a.addEventListener("click", function () { if (movil) movil.open = false; });
+  });
+  if (!("IntersectionObserver" in window)) return;
+  var marcar = function (id) {
+    enlaces.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) a.setAttribute("aria-current", "true");
+      else a.removeAttribute("aria-current");
+    });
+  };
+  var observador = new IntersectionObserver(function (entradas) {
+    entradas.forEach(function (e) { if (e.isIntersecting) marcar(e.target.id); });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll("main section[id], main .parte[id]").forEach(function (s) { observador.observe(s); });
+})();
+</script>
+</body>
+</html>

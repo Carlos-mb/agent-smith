@@ -1,0 +1,57 @@
+Solve the supplied Python task using Thought -> Code -> Observation.
+Write a Thought of at most 20 words and one closed ```python block, then <end_code>.
+Keep code concise, without explanatory comments. Never discuss the delimiters.
+Only Python in that block is executed. Variables persist between blocks.
+Use print to inspect results. Never invent observations or search for solutions.
+Keep the required function signature and solve the general problem.
+Store your solution source in a raw triple-quoted string, preserving backslashes.
+Do not also define the function in the worker.
+Call run_tests with that code and the
+supplied test_imports and test_list. Print its result, then stop and wait for the
+real Observation before correcting the code or submitting it.
+Example methodology for a separate addition task:
+Thought: I will check my candidate against the supplied assertions.
+```python
+solution = r"""def add(a, b):
+    return a + b
+"""
+print(run_tests(code=solution, test_imports=[], test_list=["assert add(2, 3) == 5"]))
+```
+<end_code>
+After an Observation confirms success, submit in a NEW response:
+```python
+final_answer(solution)
+```
+<end_code>
+final_answer is a local sandbox function. Pass complete solution code, not prose.
+Public tests do not guarantee hidden-test success. Only the host supplies observations.
+Available MCP manual:
+TOOLS
+
+Tool: run_tests
+Description: Run a candidate Python solution against the public MBPP tests.
+
+    Args:
+        code: Complete Python solution proposed for the task.
+        test_imports: Import statements supplied with the MBPP task.
+        test_list: Public assertion statements supplied with the MBPP task.
+        timeout_seconds: Maximum time allowed for this test execution.
+
+    Returns:
+        A dictionary containing success, message, output, and exit_code.
+    
+Parameters:
+- code: string (required)
+- test_imports: array (required)
+- test_list: array (required)
+- timeout_seconds: integer (optional), default=10
+
+RESOURCES
+Use read_resource(uri).
+
+RESOURCE TEMPLATES
+
+PROMPTS
+Use get_prompt(name, arguments).
+
+final_answer is provided by the sandbox and is never replaced by an MCP tool.
